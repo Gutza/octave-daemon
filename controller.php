@@ -26,7 +26,6 @@ class Octave_controller
 			$pipes
 		);
 		list($this->stdin,$this->stdout,$this->stderr)=$pipes;
-		stream_set_blocking($this->stdout,false);
 
 	}
 
@@ -35,14 +34,20 @@ class Octave_controller
 		fputs($this->stdin,$stuff);
 	}
 
-	function retrieve($socket)
+	function retrieve($socket,$mandatory=false)
 	{
+		if ($mandatory) {
+			stream_set_blocking($socket,true);
+			$result=fgets($socket);
+			stream_set_blocking($socket,false);
+		} else
+			$result="";
+
 		$read=array($socket);
 		$write=NULL;
 		$except=NULL;
 
-		$result="";
-		while(stream_select($read,$write,$except,0,100000))
+		while(stream_select($read,$write,$except,0,0))
 			$result.=fgets($read[0]);
 
 		return $result;
@@ -50,8 +55,9 @@ class Octave_controller
 
 	function read()
 	{
+		$payload=$this->retrieve($this->stdout,true);
 		$this->errors=$this->retrieve($this->stderr);
-		return $this->retrieve($this->stdout);
+		return $payload;
 	}
 
 }
