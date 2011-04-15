@@ -10,6 +10,8 @@ class Octave_controller
 	var $stderr;
 	var $process;
 
+	var $quiet=false;
+
 	function __construct()
 	{
 	}
@@ -21,7 +23,7 @@ class Octave_controller
 			array(
 				0 => array("pipe", "r"),
 				1 => array("pipe", "w"),
-				2 => array("pipe", "r")
+				2 => array("pipe", "w")
 			),
 			$pipes
 		);
@@ -47,7 +49,7 @@ class Octave_controller
 		$write=NULL;
 		$except=NULL;
 
-		while(stream_select($read,$write,$except,0,0))
+		while(stream_select($read,$write,$except,0))
 			$result.=fgets($read[0]);
 
 		return $result;
@@ -56,7 +58,13 @@ class Octave_controller
 	function read()
 	{
 		$payload=$this->retrieve($this->stdout,true);
-		$this->errors=$this->retrieve($this->stderr);
+
+		if (
+			($this->errors=$this->retrieve($this->stderr)) &&
+			!$this->quiet
+		)
+			trigger_error("Octave: ".trim($this->errors),E_USER_WARNING);
+
 		return $payload;
 	}
 
@@ -77,6 +85,10 @@ if ($pid==-1) {
 
 
 $c->send("5+5\n");
+
+echo $c->read();
+
+$c->send("7/0\n");
 
 echo $c->read();
 
