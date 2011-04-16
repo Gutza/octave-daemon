@@ -16,4 +16,8 @@ if ($pid==-1) {
 
 echo $c->runRead("5+5");
 
-echo $c->runRead("asd");
+//echo $c->runRead("asd");
+
+echo "------HERE--------\n";
+
+echo $c->query("100-33");

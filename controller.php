@@ -180,32 +180,34 @@ class Octave_controller
 	/**
 	* Prepares commands for passing to Octave.
 	*
-	* Ensures that we pass clean commands that don't produce any output.
+	* Ensures that we pass clean commands that predictably produce or don't produce output.
 	* Used internally by {@link run}().
 	* @param string $command the command to be send
+	* @param boolean $withOutput whether to produce output (controls the final semicolon)
 	* @return string the proper command, with a trailing semicolon and newline
 	*/
-	private function _prepareCommand($command)
+	private function _prepareCommand($command,$withOutput=false)
 	{
 		$command=trim($command);
+
 		while(substr($command,-1)==';')
 			$command=substr($command,0,-1);
-		$command.=";\n";
+
+		if ($withOutput)
+			return $command."\n";
+
+		return $command.";\n";
 	}
 
 	/**
 	* Executes a command that doesn't generate output.
 	*
 	* @param string $command the command to execute
-	* @param boolean $raw whether the command should be executed as-is.
-	* 	You typically don't need to use this.
 	* @return boolean whether the command was successfully sent to Octave
 	*/
-	public function run($command,$raw=false)
+	public function run($command)
 	{
-		if (!$raw)
-			$command=$this->_prepareCommand($command);
-		return $this->_send($command);
+		return $this->_send($this->_prepareCommand($command));
 	}
 
 	/**
@@ -216,10 +218,27 @@ class Octave_controller
 	*/
 	public function runRead($command)
 	{
-		if (!$this->run(trim($command)."\n",true))
+		if (!$this->_send($this->_prepareCommand($command,true)))
 			return false;
 
 		return $this->_retrieve();
+	}
+
+	/**
+	* Executes {@link runRead()}, ensures that we receive a valid answer and
+	* clips off the Octave answer prefix ("ans=").
+	*
+	* @param $command string The command to execute
+	* @return mixed the result as a string, or boolean false on error
+	*/
+	public function query($command)
+	{
+		$result=$this->runRead($command);
+
+		if (!strlen($result) || substr($result,0,5)!='ans =')
+			return false;
+
+		return trim(substr($result,5))."\n";
 	}
 }
 
