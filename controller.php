@@ -80,7 +80,18 @@ class Octave_controller
 			),
 			$pipes
 		);
+
+		if (!is_resource($this->process))
+			throw new RuntimeException("Failed starting Octave process.");
+
 		list($this->stdin,$this->stdout,$this->stderr)=$pipes;
+
+		stream_set_blocking($this->stdout,false);
+		stream_set_blocking($this->stderr,false);
+
+		if ($error=$this->_read($this->stderr,10000))
+			throw new RuntimeException("Failed starting Octave process: ".trim($error));
+
 		$this->_read($this->stdout,true); // dump the welcome message
 	}
 
@@ -107,19 +118,22 @@ class Octave_controller
 	*/
 	private function _read($socket,$mandatory=false)
 	{
-		if ($mandatory) {
+		if ($mandatory===true) {
 			stream_set_blocking($socket,true);
 			$result=fgets($socket);
 			stream_set_blocking($socket,false);
 		} else
 			$result="";
 
-		$read=array($socket);
-		$write=NULL;
-		$except=NULL;
+		$read=$write=$error=array($socket);
 
-		while(stream_select($read,$write,$except,0))
-			$result.=fgets($read[0]);
+		while(stream_select($read,$write,$error,0,$mandatory)) {
+			$line=fgets($read[0]);
+			if ($line)
+				$result.=$line;
+			else
+				return $result;
+		}
 
 		return $result;
 	}
@@ -180,16 +194,3 @@ class Octave_controller
 	}
 }
 
-$c=new Octave_controller();
-$c->init();
-
-$pid=pcntl_fork();
-if ($pid==-1) {
-	die("Could not fork!");
-} elseif ($pid) {
-	// wait for child
-	pcntl_wait($status);
-	echo "Child is done\n";
-}
-
-echo $c->execRead("5+5");
