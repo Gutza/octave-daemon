@@ -81,7 +81,8 @@ class Octave_controller
 	/**
 	* Initializes the controller.
 	*
-	* Starts the Octave process and dumps the welcome message.
+	* Starts the Octave process and drops the welcome message.
+	* Throws a RuntimeException if it fails to start the Octave process.
 	*
 	* @return void
 	*/
@@ -126,7 +127,7 @@ class Octave_controller
 	* Reads from one of Octave process's sockets.
 	*
 	* This is really, really private stuff -- you really never need to call this;
-	* call {@link _retrieve}() instead from descendants, or {@link execute}() from
+	* call {@link _retrieve}() instead from descendants, or {@link run}() from
 	* outside.
 	*
 	* @param resource $socket The socket; must be one of {@link $stdout} or {@link $stderr}
@@ -158,12 +159,12 @@ class Octave_controller
 	/**
 	* Reads generic output from the Octave process.
 	*
-	* This method tames {@link _read}() to some degree, but you typically shouldn't
-	* need to call it directly anyway.
+	* This method tames {@link _read()} to some degree, but you typically shouldn't
+	* need to call it directly anyway -- use {@link runRead()}.
 	*
 	* @return string Whatever was found in Octave's output buffer.
 	*/
-	protected function _retrieve()
+	private function _retrieve()
 	{
 		$payload=$this->_read($this->stdout,true);
 
@@ -177,10 +178,10 @@ class Octave_controller
 	}
 
 	/**
-	* Prepares commands for passing to Octave
+	* Prepares commands for passing to Octave.
 	*
 	* Ensures that we pass clean commands that don't produce any output.
-	* Used internally by {@link exec}.
+	* Used internally by {@link run}().
 	* @param string $command the command to be send
 	* @return string the proper command, with a trailing semicolon and newline
 	*/
@@ -193,14 +194,14 @@ class Octave_controller
 	}
 
 	/**
-	* Executes a command that doesn't generate output
+	* Executes a command that doesn't generate output.
 	*
 	* @param string $command the command to execute
 	* @param boolean $raw whether the command should be executed as-is.
 	* 	You typically don't need to use this.
 	* @return boolean whether the command was successfully sent to Octave
 	*/
-	public function exec($command,$raw=false)
+	public function run($command,$raw=false)
 	{
 		if (!$raw)
 			$command=$this->_prepareCommand($command);
@@ -208,14 +209,14 @@ class Octave_controller
 	}
 
 	/**
-	* Essentially the same as {@link exec}(), but also returns the result.
+	* Essentially the same as {@link run()}, but also returns the result.
 	*
-	* @param $command strinf The command to execute
+	* @param $command string The command to execute
 	* @return mixed The result as a string, or boolean false on error.
 	*/
-	public function execRead($command)
+	public function runRead($command)
 	{
-		if (!$this->exec(trim($command)."\n",true))
+		if (!$this->run(trim($command)."\n",true))
 			return false;
 
 		return $this->_retrieve();

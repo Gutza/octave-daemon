@@ -24,14 +24,14 @@ class unitTest extends PHPUnit_Framework_TestCase
 
 	public function testSimple()
 	{
-		$result=$this->octave->execRead("5+5");
+		$result=$this->octave->runRead("5+5");
 		$this->assertEquals(trim($result),"ans =  10");
 	}
 
 	public function testWarning()
 	{
 		$this->octave->quiet=true;
-		$this->octave->execRead("1/0");
+		$this->octave->runRead("1/0");
 		$this->octave->quiet=false;
 		$this->assertEquals(trim($this->octave->errors),"warning: division by zero");
 	}
