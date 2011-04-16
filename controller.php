@@ -61,7 +61,9 @@ class Octave_controller
 	public $quiet=false;
 
 	/**
-	* The Octave errors triggered by the last command. Read these if you set {@link $quiet} to false
+	* The Octave errors triggered by the last command.
+	*
+	* Read these if you set {@link $quiet} to false.
 	*
 	* @var string
 	*/
