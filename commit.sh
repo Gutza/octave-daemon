@@ -1,3 +1,5 @@
+fail=/tmp/octave-fail
+
 function ensure_identity
 {
 	# test whether standard identities have been added to the agent already
@@ -9,10 +11,11 @@ function ensure_identity
 	return 0
 }
 
-phpunit phpunit.php > /tmp/octave-fail || (
-	cat /tmp/octave-fail &&
+phpunit phpunit.php > "$fail" || (
+	cat "$fail" &&
 	octave-fail 2>/dev/null
 ) &&
+rm -f "$fail" &&
 git commit -a &&
 ensure_identity &&
 git push &&
