@@ -11,7 +11,7 @@ function ensure_identity
 	return 0
 }
 
-phpunit phpunit.php > "$fail" || (
+phpunit test/phpunit.php > "$fail" || (
 	cat "$fail" &&
 	rm "$fail" &&
 	false

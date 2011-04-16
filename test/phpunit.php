@@ -13,7 +13,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 	/**
 	* @expectedException RuntimeException
 	*/
-	public function testException()
+	public function testNoBinary()
 	{
 		$c=new Octave_controller();
 		$nonfile=tempnam("/tmp","octave_");
@@ -22,7 +22,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$c->init();
 	}
 
-	public function testSimple()
+	public function testSimpleArithmetic()
 	{
 		$result=$this->octave->runRead("5+5");
 		$this->assertEquals(trim($result),"ans =  10");
@@ -31,8 +31,16 @@ class unitTest extends PHPUnit_Framework_TestCase
 	public function testWarning()
 	{
 		$this->octave->quiet=true;
-		$this->octave->runRead("1/0");
+		$this->assertEquals(trim($this->octave->runRead("1/0")),"ans = Inf");
 		$this->octave->quiet=false;
 		$this->assertEquals(trim($this->octave->errors),"warning: division by zero");
+	}
+
+	public function testError()
+	{
+		$this->octave->quiet=true;
+		$this->assertEquals(trim($this->octave->runRead("qwerty")),"");
+		$this->octave->quiet=false;
+		$this->assertEquals(trim($this->octave->errors),"error: `qwerty' undefined near line 1 column 1");
 	}
 }
