@@ -120,7 +120,14 @@ class Octave_controller
 		return $payload;
 	}
 
-	private function prepareCommand($command)
+	/**
+	* Prepares commands for passing to Octave
+	* Ensures that we pass clean commands that don't produce any output.
+	* Used internally by {@link exec}.
+	* @param string $command the command to be send
+	* @return string the proper command, with a trailing semicolon and newline
+	*/
+	private function _prepareCommand($command)
 	{
 		$command=trim($command);
 		while(substr($command,-1)==';')
@@ -131,7 +138,7 @@ class Octave_controller
 	public function exec($command,$raw=false)
 	{
 		if (!$raw)
-			$command=$this->prepareCommand($command);
+			$command=$this->_prepareCommand($command);
 		$this->_send($command);
 	}
 
