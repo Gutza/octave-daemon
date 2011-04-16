@@ -19,7 +19,7 @@ class Octave_controller
 
 	/**
 	* The Octave process's standard input stream
-	* @type resource
+	* @var resource
 	*/
 	private $stdin;
 	private $stdout;
