@@ -17,6 +17,10 @@ class Octave_controller
 	*/ 
 	public $octave_binary="octave";
 
+	/**
+	* The Octave process's standard input stream
+	* @type resource
+	*/
 	private $stdin;
 	private $stdout;
 	private $stderr;
