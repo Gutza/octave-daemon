@@ -14,10 +14,30 @@ if ($pid==-1) {
 	echo "Child is done\n";
 }
 
-echo $c->runRead("5+5");
+//echo $c->runRead("5+5");
 
 //echo $c->runRead("asd");
 
-echo "------HERE--------\n";
+//echo "------HERE--------\n";
 
-echo $c->query("100-33");
+//echo $c->query("100-33");
+
+echo "----LATER---\n";
+
+$c->run("
+function answer = lg_factorial6( n )
+
+    answer = 1;
+    
+    if( n == 0 )
+        return;
+    else
+        for i = 2:n
+            answer = answer * i;
+        endfor
+    endif
+
+endfunction
+");
+
+echo $c->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");

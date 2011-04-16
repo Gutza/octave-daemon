@@ -64,4 +64,25 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->octave->quiet=false;
 		$this->assertEquals(trim($this->octave->errors),"error: `qwerty' undefined near line 1 column 1");
 	}
+
+	public function testSlow()
+	{
+		$this->octave->run("
+			function answer = lg_factorial6(n)
+				answer = 1;
+    
+				if( n == 0 )
+					return;
+				else
+					for i = 2:n
+						answer = answer * i;
+					endfor
+				endif
+			endfunction
+		");
+
+		$tictoc=$this->octave->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");
+		$this->assertStringStartsWith("Elapsed time is",$tictoc);
+		$this->assertEmpty($this->octave->errors);
+	}
 }
