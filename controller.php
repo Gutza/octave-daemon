@@ -9,11 +9,13 @@ class Octave_controller
 {
 	/**
 	* Explicit path to the Cctave binary. In most setups you shouldn't need to populate this.
+	* @var string
 	*/
 	public $octave_path="";
 
 	/**
 	* The name of the Octave binary. You typically don't need to change this.
+	* @var string
 	*/ 
 	public $octave_binary="octave";
 
@@ -22,22 +24,40 @@ class Octave_controller
 	* @var resource
 	*/
 	private $stdin;
+
+	/**
+	* The Octave process's standard output stream
+	* @var resource
+	*/
 	private $stdout;
+
+	/**
+	* The Octave process's standard error stream
+	* @var resource
+	*/
 	private $stderr;
+
+	/**
+	* The Octave process
+	* @var resource
+	*/
 	private $process;
 
 	/**
 	* Change this to true if you don't want warnings from Octave to bubble up.
+	* @var boolean
 	*/
 	public $quiet=false;
 
 	/**
 	* The Octave errors triggered by the last command. Read these if you set {@link $quiet} to false
+	* @var string
 	*/
 	public $errors="";
 
 	/**
 	* The class constructor.
+	* @return void
 	*/
 	public function __construct()
 	{
