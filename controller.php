@@ -238,7 +238,7 @@ class Octave_controller
 		if (!strlen($result) || substr($result,0,5)!='ans =')
 			return false;
 
-		return trim(substr($result,5))."\n";
+		return trim(substr($result,5));
 	}
 }
 
