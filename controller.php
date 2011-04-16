@@ -1,22 +1,51 @@
 <?php
 
+/**
+* The basic process controller for Octave.
+* It only performs the most basic tasks (it starts the process, sends commands and reads raw output).
+*/
+
 class Octave_controller
 {
+	/**
+	* Explicit path to the Cctave binary. In most setups you shouldn't need to populate this.
+	*/
+	public $octave_path="";
 
-	var $octave_path="";
-	var $octave_binary="octave";
-	var $stdin;
-	var $stdout;
-	var $stderr;
-	var $process;
+	/**
+	* The name of the Octave binary. You typically don't need to change this.
+	*/ 
+	public $octave_binary="octave";
 
-	var $quiet=false;
+	private $stdin;
+	private $stdout;
+	private $stderr;
+	private $process;
 
-	function __construct()
+	/**
+	* Change this to true if you don't want warnings from Octave to bubble up.
+	*/
+	public $quiet=false;
+
+	/**
+	* The Octave errors triggered by the last command. Read these if you set {@link $quiet} to false
+	*/
+	public $errors="";
+
+	/**
+	* The class constructor.
+	*/
+	public function __construct()
 	{
 	}
 
-	function init()
+	/**
+	* Initializes the controller.
+	* Starts the Octave process and dumps the welcome message.
+	*
+	* @return void
+	*/
+	public function init()
 	{
 		$this->process=proc_open(
 			$this->octave_path.$this->octave_binary,
@@ -28,15 +57,31 @@ class Octave_controller
 			$pipes
 		);
 		list($this->stdin,$this->stdout,$this->stderr)=$pipes;
-
+		$this->_read($this->stdout,true); // dump the welcome message
 	}
 
-	function send($stuff)
+	/**
+	* Sends a string to the Octave process.
+	*
+	* @param string $payload The string to send over.
+	* @return boolean Whether the payload was successfully delivered
+	*/
+	private function _send($payload)
 	{
-		fputs($this->stdin,$stuff);
+		return strlen($payload)==fwrite($this->stdin,$payload);
 	}
 
-	function retrieve($socket,$mandatory=false)
+	/**
+	* Reads from one of Octave process's sockets.
+	* This is really, really private stuff -- you really never need to call this;
+	* call {@link _retrieve}() instead from descendants, or {@link execute}() from
+	* outside.
+	*
+	* @param resource $socket The socket; must be one of {@link $stdout} or {@link $stderr}
+	* @param boolean $mandatory Whether output must be present. Waits indefinitely if true and there's no output.
+	* @return string Whatever was found in the socket's buffer.
+	*/
+	private function _read($socket,$mandatory=false)
 	{
 		if ($mandatory) {
 			stream_set_blocking($socket,true);
@@ -55,12 +100,19 @@ class Octave_controller
 		return $result;
 	}
 
-	function read()
+	/**
+	* Reads generic output from the Octave process.
+	* This method tames {@link _read}() to some degree, but you typically shouldn't
+	* need to call it directly anyway.
+	*
+	* @return string Whatever was found in Octave's output buffer.
+	*/
+	protected function _retrieve()
 	{
-		$payload=$this->retrieve($this->stdout,true);
+		$payload=$this->_read($this->stdout,true);
 
 		if (
-			($this->errors=$this->retrieve($this->stderr)) &&
+			($this->errors=$this->_read($this->stderr)) &&
 			!$this->quiet
 		)
 			trigger_error("Octave: ".trim($this->errors),E_USER_WARNING);
@@ -68,11 +120,30 @@ class Octave_controller
 		return $payload;
 	}
 
+	private function prepareCommand($command)
+	{
+		$command=trim($command);
+		while(substr($command,-1)==';')
+			$command=substr($command,0,-1);
+		$command.=";\n";
+	}
+
+	public function exec($command,$raw=false)
+	{
+		if (!$raw)
+			$command=$this->prepareCommand($command);
+		$this->_send($command);
+	}
+
+	public function execRead($command)
+	{
+		$this->exec(trim($command)."\n",true);
+		return $this->_retrieve();
+	}
 }
 
 $c=new Octave_controller();
 $c->init();
-echo $c->read();
 
 $pid=pcntl_fork();
 if ($pid==-1) {
@@ -83,13 +154,4 @@ if ($pid==-1) {
 	echo "Child is done\n";
 }
 
-
-$c->send("5+5\n");
-
-echo $c->read();
-
-$c->send("7/0\n");
-
-echo $c->read();
-
-echo "--clean exit--\n";
+echo $c->execRead("5+5");
