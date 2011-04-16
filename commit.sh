@@ -20,4 +20,4 @@ rm -f "$fail" &&
 git commit -a &&
 ensure_identity &&
 git push &&
-phpdoc -dn octave-controller -d . -t /var/www/html/projects.moongate.ro/octave-daemon -ti "Octave-daemon" > /dev/null
+phpdoc -q -i test -dn octave-controller -d . -t /var/www/html/projects.moongate.ro/octave-daemon -ti "Octave-daemon"

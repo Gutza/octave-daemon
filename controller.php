@@ -8,55 +8,68 @@
 class Octave_controller
 {
 	/**
-	* Explicit path to the Cctave binary. In most setups you shouldn't need to populate this.
+	* Explicit path to the Cctave binary.
+	*
+	* In most setups you shouldn't need to populate this.
+	*
 	* @var string
 	*/
 	public $octave_path="";
 
 	/**
-	* The name of the Octave binary. You typically don't need to change this.
+	* The name of the Octave binary.
+	*
+	* You typically don't need to change this.
+	*
 	* @var string
 	*/ 
 	public $octave_binary="octave";
 
 	/**
 	* The Octave process's standard input stream
+	*
 	* @var resource
 	*/
 	private $stdin;
 
 	/**
 	* The Octave process's standard output stream
+	*
 	* @var resource
 	*/
 	private $stdout;
 
 	/**
 	* The Octave process's standard error stream
+	*
 	* @var resource
 	*/
 	private $stderr;
 
 	/**
 	* The Octave process
+	*
 	* @var resource
 	*/
 	private $process;
 
 	/**
 	* Change this to true if you don't want warnings from Octave to bubble up.
+	*
 	* @var boolean
 	*/
 	public $quiet=false;
 
 	/**
 	* The Octave errors triggered by the last command. Read these if you set {@link $quiet} to false
+	*
 	* @var string
 	*/
 	public $errors="";
 
 	/**
 	* The class constructor.
+	*
 	* @return void
 	*/
 	public function __construct()
@@ -65,6 +78,7 @@ class Octave_controller
 
 	/**
 	* Initializes the controller.
+	*
 	* Starts the Octave process and dumps the welcome message.
 	*
 	* @return void
@@ -108,6 +122,7 @@ class Octave_controller
 
 	/**
 	* Reads from one of Octave process's sockets.
+	*
 	* This is really, really private stuff -- you really never need to call this;
 	* call {@link _retrieve}() instead from descendants, or {@link execute}() from
 	* outside.
@@ -140,6 +155,7 @@ class Octave_controller
 
 	/**
 	* Reads generic output from the Octave process.
+	*
 	* This method tames {@link _read}() to some degree, but you typically shouldn't
 	* need to call it directly anyway.
 	*
@@ -160,6 +176,7 @@ class Octave_controller
 
 	/**
 	* Prepares commands for passing to Octave
+	*
 	* Ensures that we pass clean commands that don't produce any output.
 	* Used internally by {@link exec}.
 	* @param string $command the command to be send
@@ -173,8 +190,9 @@ class Octave_controller
 		$command.=";\n";
 	}
 
-	/*
+	/**
 	* Executes a command that doesn't generate output
+	*
 	* @param string $command the command to execute
 	* @param boolean $raw whether the command should be executed as-is.
 	* 	You typically don't need to use this.
@@ -187,9 +205,17 @@ class Octave_controller
 		return $this->_send($command);
 	}
 
+	/**
+	* Essentially the same as {@link exec}(), but also returns the result.
+	*
+	* @param $command strinf The command to execute
+	* @return mixed The result as a string, or boolean false on error.
+	*/
 	public function execRead($command)
 	{
-		$this->exec(trim($command)."\n",true);
+		if (!$this->exec(trim($command)."\n",true))
+			return false;
+
 		return $this->_retrieve();
 	}
 }
