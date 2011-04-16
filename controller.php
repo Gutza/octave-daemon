@@ -135,11 +135,18 @@ class Octave_controller
 		$command.=";\n";
 	}
 
+	/*
+	* Executes a command that doesn't generate output
+	* @param string $command the command to execute
+	* @param boolean $raw whether the command should be executed as-is.
+	* 	You typically don't need to use this.
+	* @return boolean whether the command was successfully sent to Octave
+	*/
 	public function exec($command,$raw=false)
 	{
 		if (!$raw)
 			$command=$this->_prepareCommand($command);
-		$this->_send($command);
+		return $this->_send($command);
 	}
 
 	public function execRead($command)
