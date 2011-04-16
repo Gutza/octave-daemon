@@ -9,13 +9,16 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->octave=new Octave_controller();
 		$this->octave->init();
 	}
+
 	/**
 	* @expectedException RuntimeException
 	*/
 	public function testException()
 	{
 		$c=new Octave_controller();
-		$c->octave_binary='foo';
+		$nonfile=tempnam("/tmp","octave_");
+		unlink($nonfile);
+		$c->octave_binary=$nonfile;
 		$c->init();
 	}
 

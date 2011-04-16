@@ -13,7 +13,8 @@ function ensure_identity
 
 phpunit phpunit.php > "$fail" || (
 	cat "$fail" &&
-	octave-fail 2>/dev/null
+	rm "$fail" &&
+	false
 ) &&
 rm -f "$fail" &&
 git commit -a &&
