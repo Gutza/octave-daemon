@@ -33,7 +33,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->octave->quiet=true;
 		$this->assertEquals($this->octave->runRead("disp(1/0)"),"inf");
 		$this->octave->quiet=false;
-		$this->assertEquals($this->octave->errors,"warning: division by zero");
+		$this->assertEquals($this->octave->lastError,"warning: division by zero");
 	}
 
 	public function testRunReadError()
@@ -41,7 +41,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->octave->quiet=true;
 		$this->assertEmpty($this->octave->runRead("qwerty"));
 		$this->octave->quiet=false;
-		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$this->octave->errors);
+		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$this->octave->lastError);
 	}
 
 	public function testQueryArithmetic()
@@ -54,7 +54,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->octave->quiet=true;
 		$this->assertEquals($this->octave->query("1/0"),"inf");
 		$this->octave->quiet=false;
-		$this->assertEquals($this->octave->errors,"warning: division by zero");
+		$this->assertEquals($this->octave->lastError,"warning: division by zero");
 	}
 
 	public function testQueryError()
@@ -62,7 +62,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->octave->quiet=true;
 		$this->assertEmpty($this->octave->query("qwerty"));
 		$this->octave->quiet=false;
-		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$this->octave->errors);
+		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$this->octave->lastError);
 	}
 
 	public function testSlow()
@@ -85,7 +85,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$tictoc=$this->octave->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");
 
 		$this->assertStringStartsWith("Elapsed time is",$tictoc);
-		$this->assertEmpty($this->octave->errors);
+		$this->assertEmpty($this->octave->lastError);
 	}
 
 	public function testLong()

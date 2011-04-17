@@ -54,6 +54,23 @@ class Octave_controller
 	public $octave_binary="octave";
 
 	/**
+	* The path Octave will be started in.
+	*
+	* Leave it to NULL if you want to use the working directory of the current PHP process.
+	* This can also be set via the constructor.
+	*
+	* @var string
+	*/
+	public $cwd=NULL;
+
+	/**
+	* If set to true, the destructor leaves the process alone.
+	*
+	* @var boolean
+	*/
+	public $hangingProcess=false;
+
+	/**
 	* The Octave process's standard input stream
 	*
 	* @var resource
@@ -95,7 +112,7 @@ class Octave_controller
 	*
 	* @var string
 	*/
-	public $errors="";
+	public $lastError="";
 
 	/**
 	* An internal separator that indicates the end of octave output.
@@ -109,8 +126,10 @@ class Octave_controller
 	*
 	* @return void
 	*/
-	public function __construct()
+	public function __construct($cwd=NULL)
 	{
+		if ($cwd!==NULL)
+			$this->cwd=$cwd;
 	}
 
 	/**
@@ -121,6 +140,9 @@ class Octave_controller
 	*/
 	public function __destruct()
 	{
+		if ($this->hangingProcess)
+			return;
+
 		$this->_send("quit\n");
 		fclose($this->stdin);
 		fclose($this->stdout);
@@ -145,7 +167,8 @@ class Octave_controller
 				1 => array("pipe", "w"),
 				2 => array("pipe", "w")
 			),
-			$pipes
+			$pipes,
+			$this->cwd
 		);
 
 		if (!is_resource($this->process))
@@ -231,11 +254,11 @@ class Octave_controller
 		$payload=$this->_read("stdout");
 
 		if (
-			($this->errors=$this->_read("stderr")) &&
-			($this->errors=rtrim($this->errors)) &&
+			($this->lastError=$this->_read("stderr")) &&
+			($this->lastError=rtrim($this->lastError)) &&
 			!$this->quiet
 		)
-			trigger_error("Octave: ".trim($this->errors),E_USER_WARNING);
+			trigger_error("Octave: ".$this->lastError,E_USER_WARNING);
 
 		return rtrim($payload);
 	}

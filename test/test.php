@@ -4,7 +4,7 @@ require "Octave_controller.php";
 
 $c=new Octave_controller();
 $c->init();
-/*
+
 $pid=pcntl_fork();
 if ($pid==-1) {
 	die("Could not fork!");
@@ -12,17 +12,21 @@ if ($pid==-1) {
 	// wait for child
 	pcntl_wait($status);
 	echo "Child is done\n";
+} else {
+	// The child
+	$c->hangingProcess=true;
 }
-*/
 
-echo $c->runRead("5+5");
+echo "5+5=".$c->query("5+5")."\n";
 
-echo $c->runRead("asd");
+//echo "asd=".$c->query("asd");
 
-echo "------HERE--------\n";
+echo "\n------HERE--------\n";
 
+flush();
+exit;
 echo $c->query("100-33");
-/*
+
 echo "----LATER---\n";
 
 $c->run("
@@ -42,5 +46,8 @@ endfunction
 ");
 
 echo $c->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");
-*/
+
+echo "Finally...\n";
 echo count(explode("\n",$c->query("rand(3,1)")))."\n";
+
+echo "\n--END--\n";
