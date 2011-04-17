@@ -1,6 +1,6 @@
 <?php
 
-require "controller.php";
+require "Octave_controller.php";
 
 $c=new Octave_controller();
 $c->init();

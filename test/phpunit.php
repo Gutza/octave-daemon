@@ -1,6 +1,6 @@
 <?php
 
-require "controller.php";
+require "Octave_controller.php";
 
 class unitTest extends PHPUnit_Framework_TestCase
 {
