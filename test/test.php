@@ -4,7 +4,7 @@ require "controller.php";
 
 $c=new Octave_controller();
 $c->init();
-
+/*
 $pid=pcntl_fork();
 if ($pid==-1) {
 	die("Could not fork!");
@@ -13,14 +13,15 @@ if ($pid==-1) {
 	pcntl_wait($status);
 	echo "Child is done\n";
 }
+*/
 
-//echo $c->runRead("5+5");
+echo $c->runRead("5+5");
 
-//echo $c->runRead("asd");
+echo $c->runRead("asd");
 
-//echo "------HERE--------\n";
+echo "------HERE--------\n";
 
-//echo $c->query("100-33");
+echo $c->query("100-33");
 /*
 echo "----LATER---\n";
 

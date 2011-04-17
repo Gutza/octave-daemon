@@ -41,7 +41,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->octave->quiet=true;
 		$this->assertEmpty(trim($this->octave->runRead("qwerty")));
 		$this->octave->quiet=false;
-		$this->assertEquals(trim($this->octave->errors),"error: `qwerty' undefined near line 1 column 1");
+		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$this->octave->errors);
 	}
 
 	public function testQueryArithmetic()
@@ -62,7 +62,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->octave->quiet=true;
 		$this->assertEmpty(trim($this->octave->query("qwerty")));
 		$this->octave->quiet=false;
-		$this->assertEquals(trim($this->octave->errors),"error: `qwerty' undefined near line 1 column 1");
+		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$this->octave->errors);
 	}
 
 	public function testSlow()
