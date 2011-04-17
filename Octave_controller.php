@@ -114,6 +114,21 @@ class Octave_controller
 	}
 
 	/**
+	* The class destructor.
+	*
+	* Cleanly quits Octave, closes the pipes and the process.
+	* @return void
+	*/
+	public function __destruct()
+	{
+		$this->_send("quit\n");
+		fclose($this->stdin);
+		fclose($this->stdout);
+		fclose($this->stderr);
+		proc_close($this->process);
+	}
+
+	/**
 	* Initializes the controller.
 	*
 	* Starts the Octave process and drops the welcome message.
