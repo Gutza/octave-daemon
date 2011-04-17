@@ -18,6 +18,6 @@ phpunit test/phpunit.php > "$fail" || (
 ) &&
 rm -f "$fail" &&
 git commit -a &&
-phpdoc -q -i test -dn octave-controller -d . -t /var/www/html/projects.moongate.ro/octave-daemon -ti "Octave-daemon" &&
+./gendoc.sh &&
 ensure_identity &&
 git push

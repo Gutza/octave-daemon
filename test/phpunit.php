@@ -81,8 +81,23 @@ class unitTest extends PHPUnit_Framework_TestCase
 			endfunction
 		");
 
+		// This is not a proper query, since it doesn't provide a regular answer
 		$tictoc=$this->octave->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");
+
 		$this->assertStringStartsWith("Elapsed time is",$tictoc);
 		$this->assertEmpty($this->octave->errors);
+	}
+
+	public function testLong()
+	{
+		$rowCount=10000;
+
+		$this->assertEquals(
+			$rowCount,
+			count(explode(
+				"\n",
+				$this->octave->query("rand(".$rowCount.",1)")
+			))
+		);
 	}
 }

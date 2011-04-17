@@ -21,7 +21,7 @@ if ($pid==-1) {
 //echo "------HERE--------\n";
 
 //echo $c->query("100-33");
-
+/*
 echo "----LATER---\n";
 
 $c->run("
@@ -41,3 +41,5 @@ endfunction
 ");
 
 echo $c->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");
+*/
+echo count(explode("\n",$c->query("rand(3,1)")))."\n";
