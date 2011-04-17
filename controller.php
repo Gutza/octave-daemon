@@ -23,11 +23,14 @@
 * The basic process controller for Octave.
 *
 * It only performs the most basic tasks (it starts the process, sends commands and reads raw output).
+*
 * @author Bogdan Stăncescu <bogdan@moongate.ro>
 * @version 1.0
 * @package octave-controller
 * @copyright Copyright (c) 2011, Bogdan Stăncescu
 * @license http://www.gnu.org/licenses/agpl-3.0.html GNU Affero GPL
+*
+* @example simple_controller_example.php Simple usage example
 */
 
 class Octave_controller
@@ -150,6 +153,7 @@ class Octave_controller
 
 		// All is well
 		$this->_read("stdout"); // dump the welcome message
+		$this->_send("format none\n");
 	}
 
 	/**
@@ -213,11 +217,12 @@ class Octave_controller
 
 		if (
 			($this->errors=$this->_read("stderr")) &&
+			($this->errors=rtrim($this->errors)) &&
 			!$this->quiet
 		)
 			trigger_error("Octave: ".trim($this->errors),E_USER_WARNING);
 
-		return $payload;
+		return rtrim($payload);
 	}
 
 	/**
@@ -268,20 +273,15 @@ class Octave_controller
 	}
 
 	/**
-	* Executes {@link runRead()}, ensures that we receive a valid answer and
-	* clips off the Octave answer prefix ("ans=").
+	* Excpects a single statement, which gets executed via Octave's {@link http://www.gnu.org/software/octave/doc/interpreter/Terminal-Output.html#index-disp-797 disp()}
+	* 
 	*
-	* @param $command string The command to execute
-	* @return mixed the result as a string, or boolean false on error
+	* @param $command string The statement to execute
+	* @return mixed the result as a string
 	*/
 	public function query($command)
 	{
-		$result=$this->runRead($command);
-
-		if (!strlen($result) || !($pos=strpos($result,"=")))
-			return false;
-
-		return trim(substr($result,$pos+1));
+		return $this->runRead("disp(".$command.")");
 	}
 }
 

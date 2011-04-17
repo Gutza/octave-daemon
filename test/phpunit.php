@@ -24,22 +24,22 @@ class unitTest extends PHPUnit_Framework_TestCase
 
 	public function testRunReadArithmetic()
 	{
-		$result=$this->octave->runRead("5+5");
-		$this->assertEquals(trim($result),"ans =  10");
+		$result=$this->octave->runRead("disp(5+5)");
+		$this->assertEquals($result,"10");
 	}
 
 	public function testRunReadWarning()
 	{
 		$this->octave->quiet=true;
-		$this->assertEquals(trim($this->octave->runRead("1/0")),"ans = Inf");
+		$this->assertEquals($this->octave->runRead("disp(1/0)"),"inf");
 		$this->octave->quiet=false;
-		$this->assertEquals(trim($this->octave->errors),"warning: division by zero");
+		$this->assertEquals($this->octave->errors,"warning: division by zero");
 	}
 
 	public function testRunReadError()
 	{
 		$this->octave->quiet=true;
-		$this->assertEmpty(trim($this->octave->runRead("qwerty")));
+		$this->assertEmpty($this->octave->runRead("qwerty"));
 		$this->octave->quiet=false;
 		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$this->octave->errors);
 	}
@@ -52,15 +52,15 @@ class unitTest extends PHPUnit_Framework_TestCase
 	public function testQueryWarning()
 	{
 		$this->octave->quiet=true;
-		$this->assertEquals($this->octave->query("1/0"),"Inf");
+		$this->assertEquals($this->octave->query("1/0"),"inf");
 		$this->octave->quiet=false;
-		$this->assertEquals(trim($this->octave->errors),"warning: division by zero");
+		$this->assertEquals($this->octave->errors,"warning: division by zero");
 	}
 
 	public function testQueryError()
 	{
 		$this->octave->quiet=true;
-		$this->assertEmpty(trim($this->octave->query("qwerty")));
+		$this->assertEmpty($this->octave->query("qwerty"));
 		$this->octave->quiet=false;
 		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$this->octave->errors);
 	}
