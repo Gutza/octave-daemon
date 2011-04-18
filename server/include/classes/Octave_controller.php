@@ -238,16 +238,19 @@ class Octave_controller
 
 		while (true) {
 			$read=array($this->stdout,$this->stderr);
+			$anyout=false;
 			while (stream_select($read,$N1,$N2,0)) {
 				foreach($read as $stream) {
-					if ($stream==$this->stdout)
+					if ($stream==$this->stdout) {
 						$result['stdout'].=fread($stream,$this->stream_limit);
+						$anyout=true;
+					}
 					if ($stream==$this->stderr)
 						$result['stderr'].=fread($stream,$this->stream_limit);
 				}
 			}
 
-			if (substr($result['stdout'],$len)==$this->octave_cursor."\n") {
+			if ($anyout && substr($result['stdout'],$len)==$this->octave_cursor."\n") {
 				$result['stdout']=substr($result['stdout'],0,$len);
 				return $result;
 			}
