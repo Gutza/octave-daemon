@@ -100,4 +100,23 @@ class unitTest extends PHPUnit_Framework_TestCase
 			))
 		);
 	}
+
+	public function testSequential()
+	{
+		$this->octave->quiet=true;
+
+		$this->octave->run("A=eye(3)");
+		$this->octave->run("B=eye(4)");
+		$this->octave->run("A*B");
+		$this->assertStringStartsWith("error: operator *: nonconformant arguments",$this->octave->lastError);
+
+		$this->assertEquals($this->octave->query("1+1"),"2");
+		$this->assertEmpty($this->octave->lastError);
+
+		$this->assertEquals("inf",$this->octave->query("1/0"));
+		$this->assertEquals("warning: division by zero",$this->octave->lastError);
+
+		$this->assertEquals("3",$this->octave->query("10-7"));
+		$this->assertEmpty($this->octave->lastError);
+	}
 }
