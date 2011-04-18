@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with this program.  If not, see {@link http://www.gnu.org/licenses/}.
 *
-* @package octave-controller-server
+* @package octave-daemon-server
 * @author Bogdan Stăncescu <bogdan@moongate.ro>
 * @version 1.0
 * @copyright Copyright (c) 2011, Bogdan Stăncescu
@@ -27,7 +27,7 @@
 /**
 * This class manages the {@link Octave_client_socket client connections} and {@link Octave_controller controller} pool.
 *
-* @package octave-controller-server
+* @package octave-daemon-server
 */
 class Octave_pool
 {

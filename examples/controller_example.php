@@ -2,7 +2,7 @@
 
 /**
 * A simple example for using the controller
-* @package octave-controller-server
+* @package octave-daemon-server
 */
 
 /**
