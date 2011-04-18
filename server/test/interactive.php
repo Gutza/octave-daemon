@@ -3,8 +3,22 @@
 require dirname(dirname(__FILE__))."/include/Octave_lib.php";
 
 $c=new Octave_controller();
-//$c->octave_binary="octave -i";
 $c->init();
+
+echo "\n";
+echo "Interactive Octave controller test.\n";
+echo "\n";
+echo "Type 'quit' to quit.\n";
+echo "Type 'run <command>' to run Octave commands without output.\n";
+echo "Type 'runRead <command>' to run an Octave command with output.\n";
+echo "Type 'query <command>' to run one Octave command and receive the result.\n";
+echo "\n";
+echo "Example session:\n";
+echo "run A=eye(3)\n";
+echo "run B=[1,2,3;4,5,6;7,8,9]\n";
+echo "query A+2*B\n";
+echo "quit\n";
+echo "\n";
 
 while(true) {
 	$line=readline("> ");
