@@ -1,10 +1,14 @@
 <?php
 
-/*
+/**
 * A simple example for using the controller
+* @package octave-controller-server
 */
 
-require dirname(dirname(__FILE__))."/include/classes/Octave_controller.php";
+/**
+* Include the server library.
+*/
+require dirname(dirname(__FILE__))."/server/include/Octave_lib.php";
 $c=new Octave_controller();
 $c->init();
 
