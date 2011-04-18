@@ -80,6 +80,14 @@ class Octave_controller
 	private $stdin;
 
 	/**
+	* The chunk size for pipe reading.
+	*
+	* By default it's 1 MiB.
+	* @var int
+	*/
+	public $stream_limit=1048576;
+
+	/**
 	* The Octave process's standard output stream
 	*
 	* @var resource
@@ -226,19 +234,24 @@ class Octave_controller
 			'stderr'=>"",
 		);
 
+		$len=-strlen($this->octave_cursor)-1;
+
 		while (true) {
-			$stdout=array($this->stdout);
-			$stderr=array($this->stderr);
-
-			while (stream_select($stderr,$N1,$N2,0))
-				$result['stderr'].=fgets($this->stderr);
-
-			while (stream_select($stdout,$N1,$N2,0)) {
-				$line=fgets($this->stdout);
-				if ($line==$this->octave_cursor."\n")
-					return $result;
-				$result['stdout'].=$line;
+			$read=array($this->stdout,$this->stderr);
+			while (stream_select($read,$N1,$N2,0)) {
+				foreach($read as $stream) {
+					if ($stream==$this->stdout)
+						$result['stdout'].=fread($stream,$this->stream_limit);
+					if ($stream==$this->stderr)
+						$result['stderr'].=fread($stream,$this->stream_limit);
+				}
 			}
+
+			if (substr($result['stdout'],$len)==$this->octave_cursor."\n") {
+				$result['stdout']=substr($result['stdout'],0,$len);
+				return $result;
+			}
+
 			usleep(100);
 		}
 	}
