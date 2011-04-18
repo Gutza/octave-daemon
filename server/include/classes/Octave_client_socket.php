@@ -91,28 +91,16 @@ class Octave_client_socket
 
 	public function entertain()
 	{
-		$this->write("HAH");
+		$this->write("Welcome! Type stuff to end connection.");
 
 		$input=$this->read();
 		if ($input===false) {
 			echo "Client exited!\n";
 		} else {
 			echo $input."\n";
-			$this->write("Quitting...");
+			$this->write("Thank you! Quitting...");
 		}
-		//$this->close();
 		echo "Child exiting...\n";
-
-		return;
-
-		$s->hangingServer=true;
-		$c=$kid['controller'];
-
-		$s->cSend("HAH!");
-		$input=$s->cRead();
-		$s->cKill();
-		echo "Child exiting...\n";
-		exit;
 	}
 
 }

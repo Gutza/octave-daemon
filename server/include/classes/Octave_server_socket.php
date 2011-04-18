@@ -36,8 +36,6 @@ class Octave_server_socket
 	public $server_port=43210;
 	public $lastError="";
 	public $allowedIP=array('127.0.0.1');
-	public $msgSep="\r\n";
-	public $hangingServer=false;
 
 	private $lockptr=NULL;
 	private $initialized=false;
@@ -90,12 +88,9 @@ class Octave_server_socket
 
 	public function __destruct()
 	{
-		if (!$this->initialized || $this->hangingServer)
+		if (!$this->initialized)
 			return;
 
-		echo "Server being destroyed in ".getmypid()."\n";
-
-		//socket_shutdown($this->socket);
 		socket_close($this->socket);
 	}
 
