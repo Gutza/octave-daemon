@@ -35,7 +35,6 @@ class Octave_server_socket
 	public $address='127.0.0.1';
 	public $port=43210;
 	public $lastError="";
-	public $lastIP="";
 	public $allowedIP=array('127.0.0.1');
 	public $msgSep="\r\n";
 	public $hangingServer=false;
@@ -132,8 +131,6 @@ class Octave_server_socket
 			socket_close($cSocket);
 			return NULL;
 		}
-
-		$this->lastIP=$remote_IP;
 
 		return $cSocket;
 	}

@@ -33,7 +33,6 @@
 class Octave_client_socket
 {
 	public $lastError="";
-	public $REMOTE_ADDR="";
 	private $controller=NULL;
 
 	public $msgSep="\r\n";
