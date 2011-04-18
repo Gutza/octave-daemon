@@ -57,7 +57,7 @@ class Octave_client_socket
 
 	public function kill()
 	{
-		socket_shutdown($this->socket);
+		@socket_shutdown($this->socket); // fugly: if the client dies while waiting for a connection, we just go through the usual hoops
 		$this->close();
 	}
 
