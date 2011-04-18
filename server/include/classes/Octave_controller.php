@@ -205,7 +205,7 @@ class Octave_controller
 			throw new RuntimeException("Failed starting the Octave process: ".trim(stream_get_contents($this->stderr)));
 
 		// All is well
-		$this->_send('PS1("\\n'.$this->octave_cursor.'\\n"); format none;'."\n");
+		$this->_send('PS1("'.$this->octave_cursor.'"); format none;'."\n");
 		$this->_read(); // dump the welcome message
 	}
 
@@ -234,7 +234,7 @@ class Octave_controller
 			'stderr'=>"",
 		);
 
-		$len=-strlen($this->octave_cursor)-1;
+		$len=-strlen($this->octave_cursor);
 
 		while (true) {
 			$read=array($this->stdout,$this->stderr);
@@ -250,7 +250,7 @@ class Octave_controller
 				}
 			}
 
-			if ($anyout && substr($result['stdout'],$len)==$this->octave_cursor."\n") {
+			if ($anyout && substr($result['stdout'],$len)==$this->octave_cursor) {
 				$result['stdout']=substr($result['stdout'],0,$len);
 				return $result;
 			}
