@@ -32,8 +32,8 @@
 */
 class Octave_server_socket
 {
-	public $address='127.0.0.1';
-	public $port=43210;
+	public $server_address='127.0.0.1';
+	public $server_port=43210;
 	public $lastError="";
 	public $allowedIP=array('127.0.0.1');
 	public $msgSep="\r\n";
@@ -41,7 +41,6 @@ class Octave_server_socket
 
 	private $lockptr=NULL;
 	private $initialized=false;
-
 	private $socket=NULL;
 
 	public function __construct()
@@ -67,10 +66,10 @@ class Octave_server_socket
 			return false;
 		}
 
-		if (!@socket_bind($this->socket,$this->address,$this->port)) {
+		if (!@socket_bind($this->socket,$this->server_address,$this->server_port)) {
 			$this->setError($this->getSocketError(
 				"Failed binding socket to ".
-				$this->address.":".$this->port
+				$this->server_address.":".$this->server_port
 			),LOG_ERR);
 			$this->unlock();
 			return false;
