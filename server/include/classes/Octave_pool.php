@@ -93,7 +93,6 @@ class Octave_pool
 					exit;
 				} elseif ($pid) {
 					// Parent
-					echo "Child pid: ".$pid."\n";
 					$kid->pid=$pid;
 					$kid->close();
 				} else {

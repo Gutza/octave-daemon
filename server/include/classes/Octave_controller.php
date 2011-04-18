@@ -117,11 +117,11 @@ class Octave_controller
 	public $lastError="";
 
 	/**
-	* An internal separator that indicates the end of octave output.
+	* Octave's cursor; it indicates the end of Octave output.
 	*
 	* @var string
 	*/
-	protected $separator="--octave-PHP-daemon--";
+	protected $octave_cursor="<od-msg-end>";
 
 	/**
 	* The class constructor.
@@ -170,7 +170,7 @@ class Octave_controller
 	public function init()
 	{
 		$this->process=proc_open(
-			$this->octave_path.$this->octave_binary,
+			$this->octave_path.$this->octave_binary." -i",
 			array(
 				0 => array("pipe", "r"),
 				1 => array("pipe", "w"),
@@ -192,15 +192,13 @@ class Octave_controller
 
 		if (!stream_select($read, $write, $except, 5))
 			throw new RuntimeException("The process timed out on all pipes -- this should never happen, please report this problem!");
-		
-		stream_set_blocking($this->stderr,false);
-		if ($error=fgets($this->stderr))
-			throw new RuntimeException("Failed starting the Octave process: ".trim($error));
-		stream_set_blocking($this->stderr,true);
+
+		if ($read[0]==$this->stderr)
+			throw new RuntimeException("Failed starting the Octave process: ".trim(stream_get_contents($this->stderr)));
 
 		// All is well
-		$this->_read("stdout"); // dump the welcome message
-		$this->_send("format none\n");
+		$this->_send('PS1("\\n'.$this->octave_cursor.'\\n"); format none;'."\n");
+		$this->_read(); // dump the welcome message
 	}
 
 	/**
@@ -217,36 +215,31 @@ class Octave_controller
 	/**
 	* Reads from one of Octave process's sockets.
 	*
-	* @param string $socket Must be one of "stdout" or "stderr"
 	* @return string Whatever was found in Octave's buffer
 	*/
-	private function _read($socket)
+	private function _read()
 	{
-		switch($socket) {
-			case 'stdout':
-				$mySocket=&$this->stdout;
-				break;
-			case 'stderr':
-				$mySocket=&$this->stderr;
-				break;
-			default:
-				throw new RuntimeException("Unknown socket for reading (".$socket."); expecting \"stdout\" or \"stderr\".");
-		}
+		$N1=$N2=NULL;
 
-		$this->_send(
-			"fflush(".$socket."); ".
-			"fdisp(".$socket.",\"".$this->separator."\");\n"
+		$result=array(
+			'stdout'=>"",
+			'stderr'=>"",
 		);
-		$result=$line="";
-		while(true) {
-			$line=fgets($mySocket);
-			if (
-				$line==$this->separator."\n" ||
-				$line===false
-			)
-				return $result;
 
-			$result.=$line;
+		while (true) {
+			$stdout=array($this->stdout);
+			$stderr=array($this->stderr);
+
+			while (stream_select($stderr,$N1,$N2,0))
+				$result['stderr'].=fgets($this->stderr);
+
+			while (stream_select($stdout,$N1,$N2,0)) {
+				$line=fgets($this->stdout);
+				if ($line==$this->octave_cursor."\n")
+					return $result;
+				$result['stdout'].=$line;
+			}
+			usleep(100);
 		}
 	}
 
@@ -260,16 +253,16 @@ class Octave_controller
 	*/
 	private function _retrieve()
 	{
-		$payload=$this->_read("stdout");
+		$payload=$this->_read();
 
 		if (
-			($this->lastError=$this->_read("stderr")) &&
+			($this->lastError=$payload['stderr']) &&
 			($this->lastError=rtrim($this->lastError)) &&
 			!$this->quiet
 		)
 			trigger_error("Octave: ".$this->lastError,E_USER_WARNING);
 
-		return rtrim($payload);
+		return rtrim($payload['stdout']);
 	}
 
 	/**
@@ -302,7 +295,9 @@ class Octave_controller
 	*/
 	public function run($command)
 	{
-		return $this->_send($this->_prepareCommand($command));
+		$success=$this->_send($this->_prepareCommand($command));
+		$this->_retrieve();
+		return $success;
 	}
 
 	/**
@@ -321,7 +316,6 @@ class Octave_controller
 
 	/**
 	* Excpects a single statement, which gets executed via Octave's {@link http://www.gnu.org/software/octave/doc/interpreter/Terminal-Output.html#index-disp-797 disp()}
-	* 
 	*
 	* @param $command string The statement to execute
 	* @return mixed the result as a string

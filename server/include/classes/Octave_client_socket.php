@@ -32,17 +32,19 @@
 */
 class Octave_client_socket
 {
-	public $lastError="";
-	private $controller=NULL;
-
-	public $msgSep="\r\n";
+	public $msgEnd="<od-msg-end>\n";
+	public $responseStart="<od-rsp>\n";
+	public $errorStart="<od-err>\n";
+	public $voidStart="<od-nil>\n";
 	public $pid=0;
 
 	private $socket=NULL;
+	private $controller=NULL;
 
 	public function __construct($controller)
 	{
 		$controller->hangingProcess=true;
+		$controller->quiet=true;
 		$this->controller=$controller;
 	}
 
@@ -81,7 +83,8 @@ class Octave_client_socket
 
 	public function write($message)
 	{
-		socket_write($this->socket,$message.$this->msgSep,strlen($message)+strlen($this->msgSep));
+		$msgLength=strlen($message)+strlen($this->msgEnd);
+		return $msgLength==socket_write($this->socket,$message.$this->msgEnd,$msgLength);
 	}
 
 	public function read()
@@ -91,16 +94,47 @@ class Octave_client_socket
 
 	public function entertain()
 	{
-		$this->write("Welcome! Type stuff to end connection.");
+		$this->write("");
+		while(true) {
+			$input=$this->read();
 
-		$input=$this->read();
-		if ($input===false) {
-			echo "Client exited!\n";
-		} else {
-			echo $input."\n";
-			$this->write("Thank you! Quitting...");
+			if ($input===false)
+				break;
+
+			$input=trim($input);
+
+			if (!strlen($input))
+				continue;
+			
+			if ($input=='quit')
+				break;
+
+			@list($command,$payload)=explode(" ",$input,2);
+			$this->processCommand($command,$payload);
 		}
-		echo "Child exiting...\n";
+	}
+
+	protected function processCommand($cmd,$payload)
+	{
+		if (!in_array($cmd,array('query','runRead','run')))
+			return $this->respond(array('error'=>"Unknown command: ".$cmd));
+
+		$this->respond(array(
+			'response'=>$this->controller->$cmd($payload),
+			'error'=>$this->controller->lastError
+		));
+		$this->controller->lastError="";
+	}
+
+	private function respond($response)
+	{
+		if (
+			isset($response['error']) &&
+			strlen($response['error'])
+		)
+			$this->write($this->errorStart.$response['error']."\n");
+
+		$this->write($this->responseStart.$response['response']."\n");
 	}
 
 }
