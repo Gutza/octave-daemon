@@ -4,7 +4,7 @@
 * A simple example for using the controller
 */
 
-require "Octave_controller.php";
+require dirname(dirname(__FILE__))."/include/classes/Octave_controller.php";
 $c=new Octave_controller();
 $c->init();
 

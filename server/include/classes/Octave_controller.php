@@ -140,14 +140,21 @@ class Octave_controller
 	*/
 	public function __destruct()
 	{
-		if ($this->hangingProcess)
+		if ($this->hangingProcess) {
+			$this->_closePipes();
 			return;
+		}
 
 		$this->_send("quit\n");
+		$this->_closePipes();
+		proc_close($this->process);
+	}
+
+	private function _closePipes()
+	{
 		fclose($this->stdin);
 		fclose($this->stdout);
 		fclose($this->stderr);
-		proc_close($this->process);
 	}
 
 	/**
