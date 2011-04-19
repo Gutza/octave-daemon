@@ -289,7 +289,7 @@ class Octave_controller
 
 			if ($anyout) {
 				if (substr($result['stdout'],$len)==$this->octave_cursor) {
-					$result['stdout']=substr($result['stdout'],0,$len);
+					$result['stdout']=rtrim(substr($result['stdout'],0,$len));
 					$this->partialResult=false;
 					return $result;
 				}
@@ -308,11 +308,11 @@ class Octave_controller
 	*
 	* See {@link $allowPartial} for details.
 	*
-	* @return array the same kind of result as {@link _read()}
+	* @return string the same kind of result as {@link _retrieve()}
 	*/
 	public function more()
 	{
-		return $this->_read();
+		return $this->_retrieve();
 	}
 
 	/**
@@ -334,7 +334,7 @@ class Octave_controller
 		)
 			trigger_error("Octave: ".$this->lastError,E_USER_WARNING);
 
-		return rtrim($payload['stdout']);
+		return $payload['stdout'];
 	}
 
 	/**
