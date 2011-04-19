@@ -56,6 +56,15 @@ class Octave_controller
 	public $octave_binary="octave";
 
 	/**
+	* The Octave binary version.
+	*
+	* This is set automatically after {@link init()}
+	*
+	* @var string
+	*/
+	public $octave_version=NULL;
+
+	/**
 	* The path Octave will be started in.
 	*
 	* Leave it to NULL if you want to use the working directory of the current PHP process.
@@ -73,19 +82,19 @@ class Octave_controller
 	public $hangingProcess=false;
 
 	/**
+	* The chunk size for pipe reading.
+	*
+	* By default it's 1 MiB. You typically shouldn't need to change it.
+	* @var int
+	*/
+	public $streamLimit=1048576;
+
+	/**
 	* The Octave process's standard input stream
 	*
 	* @var resource
 	*/
 	private $stdin;
-
-	/**
-	* The chunk size for pipe reading.
-	*
-	* By default it's 1 MiB.
-	* @var int
-	*/
-	public $stream_limit=1048576;
 
 	/**
 	* The Octave process's standard output stream
@@ -123,6 +132,26 @@ class Octave_controller
 	* @var string
 	*/
 	public $lastError="";
+
+	/**
+	* Whether to allow partial reads.
+	*
+	* If enabled, you need to check whether {@link $partialResult} is set;
+	* if set, call {@link more()} to receive the next batch; repeat until finished
+	* (i.e. unti $partialResult is false).
+	*
+	* @var boolean
+	*/
+	public $allowPartial=false;
+
+	/**
+	* Whether the last result was partial.
+	*
+	* See {@link $allowPartial} for details.
+	*
+	* @var boolean
+	*/
+	public $partialResult;
 
 	/**
 	* Octave's cursor; it indicates the end of Octave output.
@@ -201,12 +230,20 @@ class Octave_controller
 		if (!stream_select($read, $write, $except, 5))
 			throw new RuntimeException("The process timed out on all pipes -- this should never happen, please report this problem!");
 
+		// Any output on stderr on startup is bad news; quit just to make sure
 		if ($read[0]==$this->stderr)
 			throw new RuntimeException("Failed starting the Octave process: ".trim(stream_get_contents($this->stderr)));
 
-		// All is well
-		$this->_send('PS1("'.$this->octave_cursor.'"); format none;'."\n");
-		$this->_read(); // dump the welcome message
+		// All is well -- set options and read welcome message (no need for partial reading here)
+		$p=$this->allowPartial;
+		$this->allowPartial=false;
+		$welcome=$this->runRead('PS1("'.$this->octave_cursor.'"); format none;'."\n");
+		$this->allowPartial=$p;
+
+		if (!preg_match("/version ([0-9.]+)$/m",$welcome,$matches))
+			throw new RuntimeException("Unrecognized welcome message from Octave:\n{\n".$welcome."}");
+
+		$this->octave_version=$matches[1];
 	}
 
 	/**
@@ -242,21 +279,40 @@ class Octave_controller
 			while (stream_select($read,$N1,$N2,0)) {
 				foreach($read as $stream) {
 					if ($stream==$this->stdout) {
-						$result['stdout'].=fread($stream,$this->stream_limit);
+						$result['stdout'].=fread($stream,$this->streamLimit);
 						$anyout=true;
 					}
 					if ($stream==$this->stderr)
-						$result['stderr'].=fread($stream,$this->stream_limit);
+						$result['stderr'].=fread($stream,$this->streamLimit);
 				}
 			}
 
-			if ($anyout && substr($result['stdout'],$len)==$this->octave_cursor) {
-				$result['stdout']=substr($result['stdout'],0,$len);
-				return $result;
+			if ($anyout) {
+				if (substr($result['stdout'],$len)==$this->octave_cursor) {
+					$result['stdout']=substr($result['stdout'],0,$len);
+					$this->partialResult=false;
+					return $result;
+				}
+				if ($this->allowPartial) {
+					$this->partialResult=true;
+					return $result;
+				}
 			}
 
 			usleep(100);
 		}
+	}
+
+	/**
+	* Retrieves more output from Octave's pipes.
+	*
+	* See {@link $allowPartial} for details.
+	*
+	* @return array the same kind of result as {@link _read()}
+	*/
+	public function more()
+	{
+		return $this->_read();
 	}
 
 	/**
