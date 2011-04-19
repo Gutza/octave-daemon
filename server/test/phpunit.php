@@ -131,4 +131,23 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals("3",$this->octave->query("10-7"));
 		$this->assertEmpty($this->octave->lastError);
 	}
+
+	public function testPartial()
+	{
+		$size=500; // Again, matrix size = $size * $size
+
+		$this->octave->allowPartial=true;
+		$r=$e=""; // results and errors
+		$rc=1; // read count
+		$r=$this->octave->query("eye(".$size.")");
+		$e=$this->octave->lastError;
+		while($this->octave->partialResult) {
+			$r.=$this->octave->more();
+			$e.=$this->octave->lastError;
+			$rc++;
+		}
+		$this->assertEquals($size,count(explode("\n",$r)));
+		$this->assertEmpty($e);
+		$this->assertGreaterThan(1,$rc);
+	}
 }
