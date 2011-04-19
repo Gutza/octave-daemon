@@ -88,17 +88,29 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->assertEmpty($this->octave->lastError);
 	}
 
-	public function testLong()
+	public function testLargeReadWrite()
 	{
-		$rowCount=10000;
+		$size=1000; // Mind you, this is $size * $size cells (1M cells, ~2M bytes for this setup)
 
-		$this->assertEquals(
-			$rowCount,
-			count(explode(
-				"\n",
-				$this->octave->query("rand(".$rowCount.",1)")
-			))
-		);
+		$query="[".
+			substr(
+				str_repeat(
+					substr(
+						str_repeat("1,",$size),
+						0,-1
+					).";",
+					$size
+				),
+				0,-1
+			)."]";
+
+		$result=$this->octave->query($query);
+		$this->assertTrue((bool)$result);
+
+		$lines=explode("\n",$result);
+		$this->assertEquals($size,count($lines));
+
+		$this->assertEquals($size,count(explode(" ",trim($lines[$size-1]))));
 	}
 
 	public function testSequential()
