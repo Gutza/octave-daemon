@@ -82,12 +82,19 @@ class Octave_controller
 	public $hangingProcess=false;
 
 	/**
-	* The chunk size for pipe reading.
+	* The maximum chunk size for pipe reading.
 	*
 	* By default it's 1 MiB. You typically shouldn't need to change it.
 	* @var int
 	*/
 	public $streamLimit=1048576;
+
+	/**
+	* The minimum chunk size for partial results.
+	* By default it's 10 KiB. You typically shouldn't need to change it.
+	* @var int
+	*/
+	public $partialLimit=10240;
 
 	/**
 	* The Octave process's standard input stream
@@ -302,20 +309,18 @@ class Octave_controller
 						$result['stderr'].=fread($stream,$this->streamLimit);
 				}
 			}
-
 			if ($anyout) {
 				if (substr($this->tail.$result['stdout'],$len)==$this->octave_cursor) {
 					$result['stdout']=substr($result['stdout'],0,$len);
 					$this->partialResult=false;
 					return $result;
 				}
-				if ($this->allowPartial) {
+				if ($this->allowPartial && strlen($result['stdout'])>=$this->partialLimit) {
 					$this->partialResult=true;
 					$this->tail=substr($this->tail.$result['stdout'],$len);
 					return $result;
 				}
 			}
-
 			usleep(100);
 		}
 	}
