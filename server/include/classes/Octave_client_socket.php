@@ -35,7 +35,6 @@ class Octave_client_socket
 	public $msgEnd="<od-msg-end>\n";
 	public $responseStart="<od-rsp>\n";
 	public $errorStart="<od-err>\n";
-	public $voidStart="<od-nil>\n";
 	public $pid=0;
 
 	private $socket=NULL;
