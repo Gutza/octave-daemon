@@ -8,4 +8,4 @@ if (!$client->init()) {
 	exit;
 }
 
-$result=$client->query("eye(3)");
+echo $client->query("eye(3)");
