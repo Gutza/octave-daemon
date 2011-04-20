@@ -80,10 +80,12 @@ class Octave_client_socket
 		return true;
 	}
 
-	public function write($message)
+	public function write($message,$complete=true)
 	{
-		$msgLength=strlen($message)+strlen($this->msgEnd);
-		return $msgLength==socket_write($this->socket,$message.$this->msgEnd,$msgLength);
+		if ($complete)
+			$message.=$this->msgEnd;
+		
+		return $msgLength==socket_write($this->socket,$message,strlen($message));
 	}
 
 	public function read()
@@ -125,7 +127,6 @@ class Octave_client_socket
 			'response'=>$this->controller->$cmd($payload),
 			'error'=>$this->controller->lastError
 		));
-		$this->controller->lastError="";
 	}
 
 	private function respond($response)
