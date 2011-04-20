@@ -137,11 +137,12 @@ class Octave_controller
 	* Whether to allow partial reads.
 	*
 	* If enabled, you need to check whether {@link $partialResult} is set;
-	* if set, call {@link more()} to receive the next batch; repeat until finished
-	* (i.e. unti $partialResult is false). Also, {@link $lastError} is subject to
-	* partial retrieval as well, so make sure to check that at every iteration as well.
-	* If you enable this and don't set {@link $quiet}, you might end up with several
-	* partial warnings (unlikely but possible).
+	* if set, call {@link more()} to receive the next batch; repeat until
+	* finished (i.e. unti $partialResult is false). In addition,
+	* {@link $lastError} is guaranteed to be set correctly only after the
+	* final call to {@link more()} (i.e. when $partialResult is false);
+	* that's also when the errors are processed, if you don't set
+	* {@link $quiet}.
 	*
 	* @var boolean
 	*/
@@ -316,6 +317,21 @@ class Octave_controller
 	}
 
 	/**
+	* Processes the current errors, if applicable
+	*
+	* @return void
+	*/
+	private function _processErrors($result)
+	{
+		$this->lastError.=$result['stderr'];
+		if ($this->partialResult)
+			return;
+
+		if ($this->lastError &&	!$this->quiet)
+			trigger_error("Octave: ".$this->lastError,E_USER_WARNING);
+	}
+
+	/**
 	* Retrieves more output from Octave's pipes.
 	*
 	* See {@link $allowPartial} for details.
@@ -324,7 +340,10 @@ class Octave_controller
 	*/
 	public function more()
 	{
-		return $this->_retrieve();
+		$payload=$this->_read();
+		$this->_processErrors($payload);
+
+		return $payload['stdout'];
 	}
 
 	/**
@@ -337,13 +356,10 @@ class Octave_controller
 	*/
 	private function _retrieve()
 	{
+		$this->tail="";
 		$payload=$this->_read();
-
-		if (
-			($this->lastError=$payload['stderr']) &&
-			!$this->quiet
-		)
-			trigger_error("Octave: ".$this->lastError,E_USER_WARNING);
+		$this->lastError="";
+		$this->_processErrors($payload);
 
 		return $payload['stdout'];
 	}
