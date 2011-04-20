@@ -33,7 +33,7 @@
 class Octave_client_socket
 {
 	public $errorStart="<od-err>\n";
-	public $msgEnd="<od-msg-end>\n";
+	public $msgEnd="\0";
 	public $pid=0;
 	public $socketLimit=1048576;
 
