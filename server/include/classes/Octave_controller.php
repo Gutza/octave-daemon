@@ -138,7 +138,10 @@ class Octave_controller
 	*
 	* If enabled, you need to check whether {@link $partialResult} is set;
 	* if set, call {@link more()} to receive the next batch; repeat until finished
-	* (i.e. unti $partialResult is false).
+	* (i.e. unti $partialResult is false). Also, {@link $lastError} is subject to
+	* partial retrieval as well, so make sure to check that at every iteration as well.
+	* If you enable this and don't set {@link $quiet}, you might end up with several
+	* partial warnings (unlikely but possible).
 	*
 	* @var boolean
 	*/
@@ -159,6 +162,14 @@ class Octave_controller
 	* @var string
 	*/
 	protected $octave_cursor="<od-msg-end>";
+
+	/*
+	* Used internally in {@link _return()} to track the Octave
+	* prompt when {@link $allowPartial} is enabled.
+	*
+	* @var string
+	*/
+	private $tail="";
 
 	/**
 	* The class constructor.
@@ -288,13 +299,14 @@ class Octave_controller
 			}
 
 			if ($anyout) {
-				if (substr($result['stdout'],$len)==$this->octave_cursor) {
+				if (substr($this->tail.$result['stdout'],$len)==$this->octave_cursor) {
 					$result['stdout']=rtrim(substr($result['stdout'],0,$len));
 					$this->partialResult=false;
 					return $result;
 				}
 				if ($this->allowPartial) {
 					$this->partialResult=true;
+					$this->tail=substr($this->tail.$result['stdout'],$len);
 					return $result;
 				}
 			}
