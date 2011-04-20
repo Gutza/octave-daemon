@@ -17,7 +17,8 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with this program.  If not, see {@link http://www.gnu.org/licenses/}.
 *
-* @package octave-daemon-client
+* @package octave-daemon
+* @subpackage client
 * @author Bogdan Stăncescu <bogdan@moongate.ro>
 * @version 1.0
 * @copyright Copyright (c) 2011, Bogdan Stăncescu
@@ -26,6 +27,8 @@
 
 /**
 * The Octave network client
+* @package octave-daemon
+* @subpackage client
 */
 class Octave_client
 {

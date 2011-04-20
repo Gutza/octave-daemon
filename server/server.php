@@ -19,7 +19,8 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with this program.  If not, see {@link http://www.gnu.org/licenses/}.
 *
-* @package octave-daemon-server
+* @package octave-daemon
+* @subpackage server
 * @author Bogdan Stăncescu <bogdan@moongate.ro>
 * @version 1.0
 * @copyright Copyright (c) 2011, Bogdan Stăncescu

@@ -17,7 +17,8 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with this program.  If not, see {@link http://www.gnu.org/licenses/}.
 *
-* @package octave-daemon-client
+* @package octave-daemon
+* @subpackage client
 * @author Bogdan Stăncescu <bogdan@moongate.ro>
 * @version 1.0
 * @copyright Copyright (c) 2011, Bogdan Stăncescu
@@ -25,10 +26,16 @@
 */
 
 /**
-* A transparent wrapper for {@link Octave_controller} and {@link Octave_client}
-* which implements a couple of data type translators for PHP.
+* This is the public front end.
+*
+* This is basically a wrapper for {@link Octave_controller} or
+* {@link Octave_client}, which also implements a couple of data
+* type translators for PHP.
+*
+* @package octave-daemon
+* @subpackage client
 */
-class Octave_liaison
+class Octave
 {
 	private $connector=NULL;
 	public $lastError="";

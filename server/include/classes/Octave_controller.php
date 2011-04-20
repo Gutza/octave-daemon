@@ -18,7 +18,8 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with this program.  If not, see {@link http://www.gnu.org/licenses/}.
 *
-* @package octave-daemon-server
+* @package octave-daemon
+* @subpackage server
 */
 
 /**
@@ -30,7 +31,8 @@
 * @version 1.0
 * @copyright Copyright (c) 2011, Bogdan Stăncescu
 * @license http://www.gnu.org/licenses/agpl-3.0.html GNU Affero GPL
-* @package octave-daemon-server
+* @package octave-daemon
+* @subpackage server
 *
 * @example controller_example.php Usage example
 */
