@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry>
+  <refmeta>
+    <refentrytitle></refentrytitle>
+
+    <manvolnum></manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>Overview</refname>
+
+    <refpurpose>Explains the purpose and philosophy of this
+    project</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command></command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsection>
+    <title>Description</title>
+
+    <para>{@link http://www.gnu.org/software/octave/ GNU Octave} is an
+    extremely fast solution for large, complex numerical computations. For
+    small scale projects, running an ad hoc Octave instance for processing is
+    perfectly acceptable. However, for larger projects, running new Octave
+    instances for each processing operation can become inefficient.</para>
+
+    <para>This daemon is meant to address the following issues with the ad hoc
+    approach:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Octave processes are persistent, which means that any data that
+        has been loaded or computed in the past will still be available for
+        newly-connected clients;</para>
+      </listitem>
+
+      <listitem>
+        <para>Octave processes are persistent, which means that all startup
+        times for new Octave processes don't affect clients;</para>
+      </listitem>
+
+      <listitem>
+        <para>The daemon is accessible via network, which means you can move
+        all Octave processes on a separate server, should you decide you need
+        to.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>In addition, the Octave daemon package also implements the following
+    features:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Allows for seamless usage of ad hoc processes, which is
+        particularly useful for prototyping and development;</para>
+      </listitem>
+
+      <listitem>
+        <para>Octave errors and warnings are properly retrieved and are easily
+        accessible;</para>
+      </listitem>
+
+      <listitem>
+        <para>Provides conversions between Octave matrices and PHP
+        arrays.</para>
+      </listitem>
+    </itemizedlist>
+  </refsection>
+</refentry>
+

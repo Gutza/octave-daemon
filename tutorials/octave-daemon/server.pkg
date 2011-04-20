@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry>
+  <refmeta>
+    <refentrytitle></refentrytitle>
+
+    <manvolnum></manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>The server</refname>
+
+    <refpurpose>Explains how the server part is built</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command></command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsection>
+    <title>Description</title>
+
+    <para>The workhorse of the entire project is {@link Octave_controller},
+    which manages an Octave process. The controller can be instantiated
+    directly or extended for raw control over the underlying Octave process
+    (regular users never need to do either of those things).</para>
+
+    <para>Class {@link Octave_pool} class manages the pool of controllers for
+    this daemon, and matches them up with incoming connections via {@link
+    Octave_client_socket} instances.</para>
+
+    <para>Class {@link Octave_server_socket} is the main network interface; it
+    only contains the raw networking logic for managing server sockets.</para>
+
+    <para>The logic for triggering the various pool actions based on incoming
+    connections lives in file {@link server.php}.</para>
+  </refsection>
+</refentry>
+
