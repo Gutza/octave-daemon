@@ -11,6 +11,7 @@ if (!$client->init()) {
 $start=microtime(true);
 $result=trim($client->query("eye(1000)"));
 echo count(explode("\n",$result));
+echo " (".number_format(strlen($result)/1024/1024,2)." MiB)\n";
 
 //echo $client->query("sum(sum(rand(1000)))");
 
