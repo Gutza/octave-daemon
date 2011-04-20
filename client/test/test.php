@@ -8,4 +8,12 @@ if (!$client->init()) {
 	exit;
 }
 
-echo $client->query("eye(3)");
+$start=microtime(true);
+$result=trim($client->query("eye(1000)"));
+echo count(explode("\n",$result));
+
+//echo $client->query("sum(sum(rand(1000)))");
+
+$end=microtime(true);
+
+echo "Total query time: ".number_format($end-$start,3)." seconds.\n";

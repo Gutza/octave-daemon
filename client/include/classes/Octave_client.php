@@ -35,6 +35,7 @@ class Octave_client
 	public $lastError="";
 	public $socketLimit=1048576;
 
+	public $errorStart="<od-err>\n";
 	public $msgEnd="<od-msg-end>\n";
 
 	private $socket;
@@ -60,7 +61,7 @@ class Octave_client
 			return false;
 		}
 
-		$this->_read();
+		$this->_read("error");
 
 		return true;
 	}
@@ -104,17 +105,62 @@ class Octave_client
 		return true;
 	}
 
-	private function _read()
+private function tr($msg=false)
+{
+	static $last=0;
+	$now=microtime(true);
+	if ($msg)
+		echo $msg." [".number_format($now-$last,3)."]\n";
+	$last=$now;
+}
+
+	private function _read($mode="result")
 	{
-		$result="";
-		$len=-strlen($this->msgEnd);
+		$result=$this->lastError=$this->tail="";
+		$MElen=strlen($this->msgEnd);
+		$ESlen=strlen($this->errorStart);
 		while(true) {
-			$result.=socket_read($this->socket, $this->socketLimit);
-			if (substr($result,$len)==$this->msgEnd) {
-				$result=substr($result,0,$len);
-				return $result;
+$this->tr();
+			$atom=@socket_read($this->socket, $this->socketLimit);
+			if ($atom===false || $atom==="") {
+				$this->lastError="The server has disconnected.";
+				return false;
 			}
+
+			if ($mode=="result") {
+				// Look for $this->errorStart
+				$pos=strpos($this->tail.$atom,$this->errorStart);
+
+				if ($pos!==false) {
+					// Append tail and atom up to error start
+					$result.=$this->tail.substr($atom,0,$pos-strlen($this->tail));
+
+					// Clip $atom to error start
+					$atom=substr($atom,$pos-strlen($this->tail)+$ESlen);
+
+					// Switch to error mode
+					$mode="error";
+				} else {
+					// Append the tail and the atom
+					$result.=$this->tail.$atom;
+
+					// Populate the tail
+					$this->tail=substr($result,-$ESlen);
+
+					// Clip the tail from the result
+					$result=substr($result,0,-$ESlen);
+				}
+			}
+
+			if ($mode=="error") {
+				$this->lastError.=$atom;
+				if (substr($this->lastError,-$MElen)==$this->msgEnd) {
+					$this->lastErrort=substr($this->lastError,0,-$MElen);
+$this->tr("DONE");
+					return $result;
+				}
+			}
+$this->tr("Loop");
 		}
 	}
-
 }
