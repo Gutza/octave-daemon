@@ -25,15 +25,15 @@ class unitTest extends PHPUnit_Framework_TestCase
 	public function testRunReadArithmetic()
 	{
 		$result=$this->octave->runRead("disp(5+5)");
-		$this->assertEquals($result,"10");
+		$this->assertEquals("10",rtrim($result));
 	}
 
 	public function testRunReadWarning()
 	{
 		$this->octave->quiet=true;
-		$this->assertEquals($this->octave->runRead("disp(1/0)"),"inf");
+		$this->assertEquals("inf",rtrim($this->octave->runRead("disp(1/0)")));
 		$this->octave->quiet=false;
-		$this->assertEquals($this->octave->lastError,"warning: division by zero");
+		$this->assertEquals("warning: division by zero",trim($this->octave->lastError));
 	}
 
 	public function testRunReadError()
@@ -46,15 +46,15 @@ class unitTest extends PHPUnit_Framework_TestCase
 
 	public function testQueryArithmetic()
 	{
-		$this->assertEquals($this->octave->query("5+5"),"10");
+		$this->assertEquals("10",rtrim($this->octave->query("5+5")));
 	}
 
 	public function testQueryWarning()
 	{
 		$this->octave->quiet=true;
-		$this->assertEquals($this->octave->query("1/0"),"inf");
+		$this->assertEquals("inf",rtrim($this->octave->query("1/0")));
 		$this->octave->quiet=false;
-		$this->assertEquals($this->octave->lastError,"warning: division by zero");
+		$this->assertEquals("warning: division by zero",trim($this->octave->lastError));
 	}
 
 	public function testQueryError()
@@ -104,7 +104,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 				0,-1
 			)."]";
 
-		$result=$this->octave->query($query);
+		$result=trim($this->octave->query($query));
 		$this->assertTrue((bool)$result);
 
 		$lines=explode("\n",$result);
@@ -122,19 +122,19 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->octave->run("A*B");
 		$this->assertStringStartsWith("error: operator *: nonconformant arguments",$this->octave->lastError);
 
-		$this->assertEquals($this->octave->query("1+1"),"2");
+		$this->assertEquals("2",rtrim($this->octave->query("1+1")));
 		$this->assertEmpty($this->octave->lastError);
 
-		$this->assertEquals("inf",$this->octave->query("1/0"));
-		$this->assertEquals("warning: division by zero",$this->octave->lastError);
+		$this->assertEquals("inf",rtrim($this->octave->query("1/0")));
+		$this->assertEquals("warning: division by zero",trim($this->octave->lastError));
 
-		$this->assertEquals("3",$this->octave->query("10-7"));
+		$this->assertEquals("3",rtrim($this->octave->query("10-7")));
 		$this->assertEmpty($this->octave->lastError);
 	}
 
 	public function testPartial()
 	{
-		$size=500; // Again, matrix size = $size * $size
+		$size=1000; // Again, matrix size = $size * $size
 
 		$this->octave->allowPartial=true;
 		$r=$e=""; // results and errors
@@ -142,11 +142,13 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$r=$this->octave->query("eye(".$size.")");
 		$e=$this->octave->lastError;
 		while($this->octave->partialResult) {
-			$r.=$this->octave->more();
+			$more=$this->octave->more();
+			$r.=$more;
 			$e.=$this->octave->lastError;
 			$rc++;
 		}
-		$this->assertEquals($size,count(explode("\n",$r)));
+
+		$this->assertEquals($size,count(explode("\n",rtrim($r))));
 		$this->assertEmpty($e);
 		$this->assertGreaterThan(1,$rc);
 	}
