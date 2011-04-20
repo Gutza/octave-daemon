@@ -1,6 +1,6 @@
 <?php
 
-require dirname(dirname(__FILE__))."/include/classes/Octave_controller.php";
+require dirname(dirname(__FILE__))."/include/Octave_server_lib.php";
 
 class unitTest extends PHPUnit_Framework_TestCase
 {

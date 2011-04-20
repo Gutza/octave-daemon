@@ -1,6 +1,6 @@
 <?php
 
-require dirname(dirname(__FILE__))."/include/Octave_lib.php";
+require dirname(dirname(__FILE__))."/include/Octave_server_lib.php";
 
 $c=new Octave_controller();
 $c->init();

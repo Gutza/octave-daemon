@@ -8,7 +8,7 @@
 /**
 * Include the server library.
 */
-require dirname(dirname(__FILE__))."/server/include/Octave_lib.php";
+require dirname(dirname(__FILE__))."/server/include/Octave_server_lib.php";
 $c=new Octave_controller();
 $c->init();
 

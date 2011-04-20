@@ -29,7 +29,7 @@
 /**
 * The SPL autoloader.
 */
-function Octave_autoloader($class_name)
+function Octave_server_autoloader($class_name)
 {
 	$filename=dirname(__FILE__).'/classes/'.$class_name.'.php';
 	if (file_exists($filename)) {
@@ -39,4 +39,4 @@ function Octave_autoloader($class_name)
 	return false;
 }
 
-spl_autoload_register('Octave_autoloader',false);
+spl_autoload_register('Octave_server_autoloader',false);
