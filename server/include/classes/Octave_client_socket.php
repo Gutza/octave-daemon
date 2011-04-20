@@ -32,10 +32,10 @@
 */
 class Octave_client_socket
 {
-	public $msgEnd="<od-msg-end>\n";
-	public $responseStart="<od-rsp>\n";
 	public $errorStart="<od-err>\n";
+	public $msgEnd="<od-msg-end>\n";
 	public $pid=0;
+	public $socketLimit=1048576;
 
 	private $socket=NULL;
 	private $controller=NULL;
@@ -44,6 +44,7 @@ class Octave_client_socket
 	{
 		$controller->hangingProcess=true;
 		$controller->quiet=true;
+		$controller->allowPartial=true;
 		$this->controller=$controller;
 	}
 
@@ -80,22 +81,32 @@ class Octave_client_socket
 		return true;
 	}
 
-	public function write($message,$complete=true)
+	public function write($message,$partial)
 	{
-		if ($complete)
+		if (!$partial)
 			$message.=$this->msgEnd;
+
+		$msgLength=strlen($message);
 		
-		return $msgLength==socket_write($this->socket,$message,strlen($message));
+		return $msgLength==socket_write($this->socket,$message,$msgLength);
 	}
 
 	public function read()
 	{
-		return @socket_read($this->socket, 2048, PHP_NORMAL_READ);
+		$result="";
+		while(substr($result,-1)!="\n") {
+			$atom=@socket_read($this->socket, $this->socketLimit);
+			if ($atom===false || $atom==="")
+				// Client exited (empty lines are "\n", not "")
+				return false;
+			$result.=$atom;
+		}
+		return substr($result,0,-1);
 	}
 
 	public function entertain()
 	{
-		$this->write("");
+		$this->write("",false);
 		while(true) {
 			$input=$this->read();
 
@@ -120,24 +131,36 @@ class Octave_client_socket
 		if (!in_array($cmd,array('query','runRead','run')))
 			return $this->respond(array(
 				'response'=>'',
-				'error'=>"Unknown command: ".$cmd
+				'error'=>"Unknown command: ".$cmd,
+				'partial'=>false
 			));
 
 		$this->respond(array(
 			'response'=>$this->controller->$cmd($payload),
-			'error'=>$this->controller->lastError
+			'error'=>$this->controller->lastError,
+			'partial'=>$this->controller->partialResult
 		));
 	}
 
 	private function respond($response)
 	{
-		if (
-			isset($response['error']) &&
-			strlen($response['error'])
-		)
-			$this->write($this->errorStart.$response['error']."\n");
+		$previousPartial=false;
 
-		$this->write($this->responseStart.$response['response']."\n");
+		do {
+			$partial=$response['partial'];
+
+			$this->write($response['response'],true); // This is never partial, because the errors always follow
+
+			if ($partial) {
+				$response=array(
+					'response'=>$this->controller->more(),
+					'error'=>$this->controller->lastError,
+					'partial'=>$this->controller->partialResult
+				);
+			} else
+				$this->write($this->errorStart.$response['error'],$partial);
+
+		} while($partial);
 	}
 
 }
