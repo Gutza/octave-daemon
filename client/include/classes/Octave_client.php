@@ -36,7 +36,7 @@ class Octave_client
 	public $socketLimit=1048576;
 
 	public $errorStart="<od-err>\n";
-	public $msgEnd="<od-msg-end>\n";
+	public $msgEnd="\0";
 
 	private $socket;
 	private $serverCommands=array(
@@ -105,22 +105,12 @@ class Octave_client
 		return true;
 	}
 
-private function tr($msg=false)
-{
-	static $last=0;
-	$now=microtime(true);
-	if ($msg)
-		echo $msg." [".number_format($now-$last,3)."]\n";
-	$last=$now;
-}
-
 	private function _read($mode="result")
 	{
 		$result=$this->lastError=$this->tail="";
 		$MElen=strlen($this->msgEnd);
 		$ESlen=strlen($this->errorStart);
 		while(true) {
-$this->tr();
 			$atom=@socket_read($this->socket, $this->socketLimit);
 			if ($atom===false || $atom==="") {
 				$this->lastError="The server has disconnected.";
@@ -141,14 +131,11 @@ $this->tr();
 					// Switch to error mode
 					$mode="error";
 				} else {
-					// Append the tail and the atom
-					$result.=$this->tail.$atom;
-
 					// Populate the tail
-					$this->tail=substr($result,-$ESlen);
+					$this->tail=substr($this->tail.$atom.$result,-$ESlen);
 
-					// Clip the tail from the result
-					$result=substr($result,0,-$ESlen);
+					// Append the old tail and the atom, minus the new tail
+					$result.=substr($this->tail.$atom,0,-$ESlen);
 				}
 			}
 
@@ -156,11 +143,9 @@ $this->tr();
 				$this->lastError.=$atom;
 				if (substr($this->lastError,-$MElen)==$this->msgEnd) {
 					$this->lastErrort=substr($this->lastError,0,-$MElen);
-$this->tr("DONE");
 					return $result;
 				}
 			}
-$this->tr("Loop");
 		}
 	}
 }
