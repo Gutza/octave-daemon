@@ -33,8 +33,9 @@ class Octave_client
 	public $server_address='127.0.0.1';
 	public $server_port=43210;
 	public $lastError="";
+	public $socketLimit=1048576;
 
-	public $msgEnd="<od-msg-end>";
+	public $msgEnd="<od-msg-end>\n";
 
 	private $socket;
 	private $serverCommands=array(
@@ -88,6 +89,7 @@ class Octave_client
 		}
 
 		$reply=$this->_read();
+		return $reply;
 	}
 
 	private function _send($payload)
@@ -105,12 +107,13 @@ class Octave_client
 	private function _read()
 	{
 		$result="";
+		$len=-strlen($this->msgEnd);
 		while(true) {
-			$line=socket_read($this->socket, 2048, PHP_NORMAL_READ);
-			if ($line==$this->msgEnd."\n")
+			$result.=socket_read($this->socket, $this->socketLimit);
+			if (substr($result,$len)==$this->msgEnd) {
+				$result=substr($result,0,$len);
 				return $result;
-
-			$result.=$line;
+			}
 		}
 	}
 
