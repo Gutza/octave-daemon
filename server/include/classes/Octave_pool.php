@@ -31,10 +31,8 @@
 */
 class Octave_pool
 {
-
 	static private $pool=array();
 	static public $maxCount=2;
-	static public $noChild=false;
 	static private $pending_connections=array();
 
 	private function __construct()
@@ -43,9 +41,13 @@ class Octave_pool
 
 	public function getChild($cSocket)
 	{
+		if ($kid=self::firstChild($cSocket))
+			return $kid;
+
 		if (count(self::$pool)<self::$maxCount)
 			return self::registerChild($cSocket);
-		return self::firstChild($cSocket);
+
+		return false;
 	}
 
 	private function registerChild($cSocket)
@@ -66,7 +68,6 @@ class Octave_pool
 			$kid->initSocket($cSocket);
 			return $kid;
 		}
-		return self::$noChild;
 	}
 
 	public function deadChild($sig)
