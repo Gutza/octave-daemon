@@ -300,7 +300,7 @@ class Octave_controller
 
 			if ($anyout) {
 				if (substr($this->tail.$result['stdout'],$len)==$this->octave_cursor) {
-					$result['stdout']=rtrim(substr($result['stdout'],0,$len));
+					$result['stdout']=substr($result['stdout'],0,$len);
 					$this->partialResult=false;
 					return $result;
 				}
@@ -341,7 +341,6 @@ class Octave_controller
 
 		if (
 			($this->lastError=$payload['stderr']) &&
-			($this->lastError=rtrim($this->lastError)) &&
 			!$this->quiet
 		)
 			trigger_error("Octave: ".$this->lastError,E_USER_WARNING);
