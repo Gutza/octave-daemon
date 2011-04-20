@@ -117,7 +117,10 @@ class Octave_client_socket
 	protected function processCommand($cmd,$payload)
 	{
 		if (!in_array($cmd,array('query','runRead','run')))
-			return $this->respond(array('error'=>"Unknown command: ".$cmd));
+			return $this->respond(array(
+				'response'=>'',
+				'error'=>"Unknown command: ".$cmd
+			));
 
 		$this->respond(array(
 			'response'=>$this->controller->$cmd($payload),
