@@ -201,6 +201,10 @@ class Octave_controller
 		proc_close($this->process);
 	}
 
+	/**
+	* Closes all the pipes open in this thread to the underlying Octave process.
+	* @return void
+	*/
 	private function _closePipes()
 	{
 		fclose($this->stdin);
