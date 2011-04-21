@@ -37,7 +37,7 @@
 * @example controller_example.php Usage example
 */
 
-class Octave_controller
+class Octave_controller extends Octave_partial_processor
 {
 	/**
 	* Explicit path to the Cctave binary.
@@ -315,9 +315,16 @@ class Octave_controller
 				if (substr($this->tail.$result['stdout'],$len)==$this->octave_cursor) {
 					$result['stdout']=substr($result['stdout'],0,$len);
 					$this->partialResult=false;
+					if ($this->partialProcessing) {
+						$this->partialProcess($result['stdout'],false);
+						$result['stdout']="";
+					}
 					return $result;
 				}
-				if ($this->allowPartial && strlen($result['stdout'])>=$this->partialLimit) {
+				if ($this->partialProcessing) {
+					$this->partialProcess($result['stdout'],true);
+					$result['stdout']="";
+				} elseif ($this->allowPartial && strlen($result['stdout'])>=$this->partialLimit) {
 					$this->partialResult=true;
 					$this->tail=substr($this->tail.$result['stdout'],$len);
 					return $result;

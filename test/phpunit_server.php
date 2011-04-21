@@ -4,6 +4,9 @@ require dirname(dirname(__FILE__))."/include/Octave_lib.php";
 
 class unitTest extends PHPUnit_Framework_TestCase
 {
+	var $partialContent="";
+	var $partialCount=0;
+
 	function __construct()
 	{
 		$this->octave=new Octave_controller();
@@ -132,7 +135,7 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->assertEmpty($this->octave->lastError);
 	}
 
-	public function testPartial()
+	public function testPartialReturn()
 	{
 		$size=1000; // Again, matrix size = $size * $size
 
@@ -151,5 +154,29 @@ class unitTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($size,count(explode("\n",rtrim($r))));
 		$this->assertEmpty($e);
 		$this->assertGreaterThan(1,$rc);
+	}
+
+	public function testPartialProcess()
+	{
+		$size=1000; // Again, matrix size = $size * $size
+
+		$this->octave->registerPartialHandler(array($this,"partialProcessor"));
+		$e=""; // errors
+		$this->octave->query("eye(".$size.")");
+		$e=$this->octave->lastError;
+
+		$this->assertEquals($size+1,count(explode("\n",$this->partialContent)));
+		$this->assertEmpty($e);
+		$this->assertGreaterThan(1,$this->partialCount);
+	}
+
+	public function partialProcessor($payload,$partial)
+	{
+		$this->partialCount++;
+		$this->partialContent.=$payload;
+		if ($partial)
+			return;
+
+		$this->partialContent=rtrim($this->partialContent)."\nfoobar";
 	}
 }
