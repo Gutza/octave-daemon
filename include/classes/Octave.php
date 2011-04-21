@@ -46,9 +46,24 @@ class Octave
 		"query"
 	);
 
-	public function __construct($connector)
+	public function __construct($connect,$port=NULL)
 	{
-		$this->connector=$connector;
+		switch(gettype($connect)) {
+			"string":
+				$this->connector=new Octave_client($connect,$port);
+				break;
+			"boolean":
+				$this->connector=new Octave_controller();
+				break;
+			"object":
+				if (!$connect instanceof iOctave_connector)
+					throw new RuntimeException("The connector must implement iOctave_connector!");
+				$this->connector=$connect;
+				break;
+			default:
+				throw new RuntimeException("Unknown connect type: ".gettype($connect));
+		}
+		$this->connector->init();
 	}
 
 	public function __call($method,$payload)
