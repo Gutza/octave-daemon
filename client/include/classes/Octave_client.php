@@ -48,8 +48,8 @@ class Octave_client
 		"query",
 		"quit"
 	);
-	private $tail="";
 	private $partialProcessing=false;
+	private $partialHandler=NULL;
 
 	public function init()
 	{
@@ -201,5 +201,19 @@ class Octave_client
 				}
 			}
 		}
+	}
+
+	public function registerPartialHandler($handler=NULL)
+	{
+		if ($handler===NULL) {
+			$this->partialProcessing=false;
+			return;
+		}
+		$this->partialHandler=$handler;
+	}
+
+	protected function partialProcess($payload,$partial)
+	{
+		return call_user_func($this->partialHandler,$payload,$partial);
 	}
 }
