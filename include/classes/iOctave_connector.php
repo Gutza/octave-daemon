@@ -23,7 +23,7 @@
 */
 
 /**
-* An interface which defines Octave connectors.
+* An interface which defines methods required by Octave connectors.
 *
 * @author Bogdan Stăncescu <bogdan@moongate.ro>
 * @version 1.0
