@@ -38,6 +38,7 @@
 */
 
 class Octave_controller extends Octave_partial_processor
+	implements iOctave_connector
 {
 	/**
 	* Explicit path to the Cctave binary.
@@ -441,5 +442,29 @@ class Octave_controller extends Octave_partial_processor
 	{
 		return $this->runRead("disp(".$command.")");
 	}
+
+	public function retrieve($filename)
+	{
+		$this->lastError="";
+		if (!file_exists($filename) || !is_readable($filename)) {
+			$this->lastError="File doesn't exist: ".$filename;
+			return false;
+		}
+
+		$result="";
+
+		$fp=@fopen($filename,'r');
+		while(!feof($fp)) {
+			$str=fread($fp,102400); // 100 KB at a time
+			if ($this->partialProcessing)
+				$this->partialProcess($str,!feof($fp));
+			else
+				$result.=$str;
+		}
+		fclose($fp);
+
+		return $result;
+	}
+
 }
 
