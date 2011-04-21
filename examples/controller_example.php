@@ -9,7 +9,7 @@
 /**
 * The octave-daemon library.
 */
-require dirname(dirname(__FILE__))."/server/include/Octave_server_lib.php";
+require dirname(dirname(__FILE__))."/include/Octave_lib.php";
 $c=new Octave_controller();
 $c->init();
 
