@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry id="{@id}">
+  <refmeta>
+    <refentrytitle></refentrytitle>
+
+    <manvolnum></manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>Network protocol</refname>
+
+    <refpurpose>Explains the network protocol used by the daemon</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command></command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 id="{@id desc}">
+    <title>Description</title>
+
+    <para>The network protocol is basically plain text, but allows for binary
+    data when transferring files. The dialog starts with the server sending a
+    server message (empty or containing server info) to the client. After
+    that, the server waits for the client to send a client message, to which
+    the server responds with a server message, and so on.</para>
+
+    <refsect2 id="{@id server_msg}">
+      <title>Server messages</title>
+
+      <para>All messages from the server must follow this format:</para>
+
+      <para>&lt;payload&gt;&lt;error separator&gt;&lt;errors&gt;&lt;message
+      end&gt;</para>
+
+      <para>where</para>
+
+      <para>&lt;payload&gt; is the actual payload of the message (matrix,
+      integer, string etc)</para>
+
+      <para>&lt;error separator&gt; is a separator, as defined in {@link
+      Octave_client::$errorStart} and {@link
+      Octave_client_socket::$errorStart}</para>
+
+      <para>&lt;errors&gt; is a string which contains any errors or warnings
+      associated with the message</para>
+
+      <para>&lt;message end&gt; is a separator, as defined in {@link
+      Octave_client::$msgEnd} and {@link Octave_client_socket::$msgEnd}</para>
+
+      <para>Both &lt;payload&gt; and &lt;errors&gt; may be empty strings, but
+      both separators must always be present.</para>
+    </refsect2>
+
+    <refsect2 id="{@id client_msg}">
+      <title>Client messages</title>
+
+      <para>All messages from the client must follow this format:</para>
+
+      <para>&lt;command&gt;[&lt;space&gt;&lt;parameters&gt;]&lt;\n&gt;</para>
+
+      <para>where</para>
+
+      <para>&lt;command&gt; must be one of "{@link Octave_controller::run()
+      run}", "{@link Octave_controller::runRead() runRead}", "{@link
+      Octave_controller::query() query}", "retr" or "quit".</para>
+
+      <para>The first three commands (run, runRead, query) mirror the methods
+      with the same name in {@link Octave_controller}; the result of these
+      commands is a regular server message, as described above.</para>
+
+      <para>The fourth command ("retr") is used for retrieving files from the
+      server (presumably Octave output, although the server will happily
+      return any file it has read access to). The command requires a single
+      parameter, which is the filename to be retrieved. Depending on whether
+      the requested file is found, the server will respond in one of two
+      ways:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>If the file isn't found (or isn't readable), the server
+          responds with a single message, with an empty payload and an error
+          message.</para>
+        </listitem>
+
+        <listitem>
+          <para>If the file is found, the server responds with two messages.
+          The first message has an empty error string, and the payload
+          contains the size of the file. The second message contains an empty
+          error string, and the payload is the content of the file as a binary
+          string.</para>
+        </listitem>
+      </orderedlist>
+
+      <para>The last command ("quit") is used to close connection to the
+      server. No parameters are expected; if any are provided, they are
+      ignored.</para>
+
+      <para>Unknown commands result in a server message with an empty payload
+      and an error message.</para>
+    </refsect2>
+  </refsect1>
+</refentry>
+
