@@ -29,8 +29,7 @@
     (regular users never need to do either of those things).</para>
 
     <para>Class {@link Octave_pool} class manages the pool of controllers for
-    this daemon, and matches them up with incoming connections via {@link
-    Octave_client_socket} instances.</para>
+    this daemon, and matches them up with incoming connections via {@link Octave_client_socket} instances.</para>
 
     <para>Class {@link Octave_server_socket} is the main network interface; it
     only contains the raw networking logic for managing server sockets.</para>

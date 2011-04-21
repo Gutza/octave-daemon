@@ -42,15 +42,12 @@
       <para>&lt;payload&gt; is the actual payload of the message (matrix,
       integer, string etc)</para>
 
-      <para>&lt;error separator&gt; is a separator, as defined in {@link
-      Octave_client::$errorStart} and {@link
-      Octave_client_socket::$errorStart}</para>
+      <para>&lt;error separator&gt; is a separator, as defined in {@link iOctave_protocol::error_start}.</para>
 
       <para>&lt;errors&gt; is a string which contains any errors or warnings
       associated with the message</para>
 
-      <para>&lt;message end&gt; is a separator, as defined in {@link
-      Octave_client::$msgEnd} and {@link Octave_client_socket::$msgEnd}</para>
+      <para>&lt;message end&gt; is a separator, as defined in {@link iOctave_protocol::error_end}.</para>
 
       <para>Both &lt;payload&gt; and &lt;errors&gt; may be empty strings, but
       both separators must always be present.</para>
@@ -66,8 +63,7 @@
       <para>where</para>
 
       <para>&lt;command&gt; must be one of "{@link Octave_controller::run()
-      run}", "{@link Octave_controller::runRead() runRead}", "{@link
-      Octave_controller::query() query}", "retr" or "quit".</para>
+      run}", "{@link Octave_controller::runRead() runRead}", "{@link Octave_controller::query() query}", "retr" or "quit".</para>
 
       <para>The first three commands (run, runRead, query) mirror the methods
       with the same name in {@link Octave_controller}; the result of these
