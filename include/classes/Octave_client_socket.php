@@ -34,8 +34,6 @@
 */
 class Octave_client_socket implements iOctave_protocol
 {
-	public $errorStart="<od-err>\n";
-	public $msgEnd="<od-end>\n";
 	public $pid=0;
 	public $socketLimit=1048576;
 
@@ -86,7 +84,7 @@ class Octave_client_socket implements iOctave_protocol
 	public function write($message,$partial)
 	{
 		if (!$partial)
-			$message.=$this->msgEnd;
+			$message.=self::error_end;
 
 		$msgLength=strlen($message);
 		
@@ -108,7 +106,7 @@ class Octave_client_socket implements iOctave_protocol
 
 	public function entertain()
 	{
-		$this->write($this->errorStart,false);
+		$this->write(self::error_start,false);
 		while(true) {
 			$input=$this->read();
 
@@ -143,13 +141,13 @@ class Octave_client_socket implements iOctave_protocol
 		if (!file_exists($filename) || !is_readable($filename))
 			return $this->sendError("File doesn't exist: ".$filename);
 
-		$this->write(filesize($filename).$this->errorStart,false);
+		$this->write(filesize($filename).self::error_start,false);
 		$fp=@fopen($filename,'r');
 		while(!feof($fp)) {
 			$str=fread($fp,102400); // 100 KB at a time
 			$this->write($str,true);
 		}
-		$this->write($this->errorStart,false);
+		$this->write(self::error_start,false);
 		fclose($fp);
 	}
 
@@ -186,7 +184,7 @@ class Octave_client_socket implements iOctave_protocol
 					'partial'=>$this->controller->partialResult
 				);
 			} else
-				return $this->write($this->errorStart.$response['error'],$partial);
+				return $this->write(self::error_start.$response['error'],$partial);
 
 		} while($partial);
 	}

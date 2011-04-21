@@ -38,9 +38,6 @@ class Octave_client implements iOctave_protocol
 	public $lastError="";
 	public $socketLimit=1048576;
 
-	public $errorStart="<od-err>\n";
-	public $msgEnd="<od-end>\n";
-
 	private $socket;
 	private $serverCommands=array(
 		"run",
@@ -134,8 +131,8 @@ class Octave_client implements iOctave_protocol
 	{
 		$state="result";
 		$result=$this->lastError=$tail="";
-		$MElen=strlen($this->msgEnd);
-		$ESlen=strlen($this->errorStart);
+		$MElen=strlen(self::error_end);
+		$ESlen=strlen(self::error_start);
 
 		if ($size===NULL) {
 			$fixed=false;
@@ -167,8 +164,7 @@ class Octave_client implements iOctave_protocol
 					continue;
 				}
 
-				// Look for $this->errorStart
-				$pos=strpos($tail.$atom,$this->errorStart);
+				$pos=strpos($tail.$atom,self::error_start);
 
 				if ($pos!==false) {
 					$atomPart=$tail.substr($atom,0,$pos-strlen($tail));
@@ -198,7 +194,7 @@ class Octave_client implements iOctave_protocol
 
 			if ($state=="error") {
 				$this->lastError.=$atom;
-				if (substr($this->lastError,-$MElen)==$this->msgEnd) {
+				if (substr($this->lastError,-$MElen)==self::error_end) {
 					$this->lastError=substr($this->lastError,0,-$MElen);
 					return $result;
 				}
