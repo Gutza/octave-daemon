@@ -39,7 +39,7 @@ class Octave_client
 	public $socketLimit=1048576;
 
 	public $errorStart="<od-err>\n";
-	public $msgEnd="\0";
+	public $msgEnd="<od-end>\n";
 
 	private $socket;
 	private $serverCommands=array(
