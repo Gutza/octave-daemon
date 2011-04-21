@@ -30,7 +30,7 @@
 * @package octave-daemon
 * @subpackage client
 */
-class Octave_client implements iOctave_protocol
+class Octave_client extends Octave_partial_processor implements iOctave_protocol
 {
 
 	public $server_address='127.0.0.1';
@@ -45,8 +45,6 @@ class Octave_client implements iOctave_protocol
 		"query",
 		"quit"
 	);
-	private $partialProcessing=false;
-	private $partialHandler=NULL;
 
 	public function init()
 	{
@@ -200,20 +198,5 @@ class Octave_client implements iOctave_protocol
 				}
 			}
 		}
-	}
-
-	public function registerPartialHandler($handler=NULL)
-	{
-		if ($handler===NULL) {
-			$this->partialProcessing=false;
-			return;
-		}
-		$this->partialProcessing=true;
-		$this->partialHandler=$handler;
-	}
-
-	protected function partialProcess($payload,$partial)
-	{
-		return call_user_func($this->partialHandler,$payload,$partial);
 	}
 }
