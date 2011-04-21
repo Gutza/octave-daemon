@@ -108,7 +108,7 @@ class Octave_client_socket
 
 	public function entertain()
 	{
-		$this->write("",false);
+		$this->write($this->errorStart,false);
 		while(true) {
 			$input=$this->read();
 
