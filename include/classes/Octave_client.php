@@ -31,21 +31,24 @@
 * @subpackage client
 */
 class Octave_client extends Octave_partial_processor
-	implements iOctave_protocol, iOctave_connector
+	implements iOctave_protocol, iOctave_connector, iOctave_network
 {
 
 	public $server_address='127.0.0.1';
-	public $server_port=43210;
+	public $server_port=self::default_port;
 	public $lastError="";
 	public $socketLimit=1048576;
 
 	private $socket;
-	private $serverCommands=array(
-		"run",
-		"runRead",
-		"query",
-		"quit"
-	);
+
+	public function __construct($host=NULL,$port=NULL)
+	{
+		if ($host!==NULL)
+			$this->server_address=$host;
+
+		if ($port!==NULL)
+			$this->server_port=$port;
+	}
 
 	public function init()
 	{

@@ -33,9 +33,10 @@
 * @subpackage server
 */
 class Octave_server_socket
+	implements iOctave_network
 {
 	public $server_address='127.0.0.1';
-	public $server_port=43210;
+	public $server_port=self::default_port;
 	public $lastError="";
 	public $allowedIP=array('127.0.0.1');
 
