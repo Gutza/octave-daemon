@@ -90,7 +90,7 @@ class Octave_client_socket
 
 		$msgLength=strlen($message);
 		
-		return $msgLength==socket_write($this->socket,$message,$msgLength);
+		return $msgLength==@socket_write($this->socket,$message,$msgLength);
 	}
 
 	public function read()
@@ -124,7 +124,8 @@ class Octave_client_socket
 				break;
 
 			@list($command,$payload)=explode(" ",$input,2);
-			$this->processCommand($command,$payload);
+			if (!$this->processCommand($command,$payload))
+				break;
 		}
 	}
 
@@ -174,7 +175,9 @@ class Octave_client_socket
 		do {
 			$partial=$response['partial'];
 
-			$this->write($response['response'],true); // This is never partial, because the errors always follow
+			// This is partial, because the errors always follow
+			if (!$this->write($response['response'],true))
+				return false;
 
 			if ($partial) {
 				$response=array(
@@ -183,7 +186,7 @@ class Octave_client_socket
 					'partial'=>$this->controller->partialResult
 				);
 			} else
-				$this->write($this->errorStart.$response['error'],$partial);
+				return $this->write($this->errorStart.$response['error'],$partial);
 
 		} while($partial);
 	}
