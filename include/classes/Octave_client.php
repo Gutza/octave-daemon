@@ -30,7 +30,8 @@
 * @package octave-daemon
 * @subpackage client
 */
-class Octave_client extends Octave_partial_processor implements iOctave_protocol
+class Octave_client extends Octave_partial_processor
+	implements iOctave_protocol, iOctave_connector
 {
 
 	public $server_address='127.0.0.1';
@@ -74,11 +75,23 @@ class Octave_client extends Octave_partial_processor implements iOctave_protocol
 		return $msg." [".$errorcode."]: ".$errormsg;
 	}
 
-	public function __call($method,$payload)
+	public function run($command)
 	{
-		if (!in_array($method,$this->serverCommands))
-			throw new RuntimeException("Unknown command: ".$method);
+		return $this->_call("run",$command);
+	}
 
+	public function runRead($command)
+	{
+		return $this->_call("runRead",$command);
+	}
+
+	public function query($command)
+	{
+		return $this->_call("query",$command);
+	}
+
+	protected function _call($method,$payload)
+	{
 		return $this->_process($method,$payload[0]);
 	}
 
