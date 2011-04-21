@@ -85,12 +85,29 @@ class Octave_client
 		return $this->_process($method,$payload[0]);
 	}
 
-	protected function _process($method,$payload="")
+	public function retrieve($filename)
 	{
-		if (!$this->_send($method." ".$payload."\n")) {
-			$this->lastError="The server has disconnected.";
+		if (!$this->_send("retr ".$filename."\n"))
+			return false;
+
+		$size=$this->_read();
+		if ($this->lastError)
+			return false;
+
+		if (!is_numeric($size)) {
+			$this->lastError="Unknown server response (not numeric).";
 			return false;
 		}
+
+echo "Size=".$size."\n";
+
+		return $this->_read($size);
+	}
+
+	protected function _process($method,$payload="")
+	{
+		if (!$this->_send($method." ".$payload."\n"))
+			return false;
 
 		$reply=$this->_read();
 		return $reply;
@@ -101,27 +118,46 @@ class Octave_client
 		$left=$payload;
 		while(strlen($left)) {
 			$result=socket_write($this->socket,$left);
-			if ($result===false)
+			if ($result===false) {
+				$this->lastError="The server has disconnected.";
 				return false;
+			}
 			$left=substr($left,$result);
 		}
 		return true;
 	}
 
-	private function _read()
+	private function _read($size=NULL)
 	{
-		$mode="result";
+		$state="result";
 		$result=$this->lastError=$this->tail="";
 		$MElen=strlen($this->msgEnd);
 		$ESlen=strlen($this->errorStart);
+
+		if ($size===NULL) {
+			$fixed=false;
+			$size=$this->socketLimit;
+		} else
+			$fixed=true;
+
 		while(true) {
-			$atom=@socket_read($this->socket, $this->socketLimit);
+			$atom=socket_read($this->socket, $size);
 			if ($atom===false || $atom==="") {
 				$this->lastError="The server has disconnected.";
 				return false;
 			}
 
-			if ($mode=="result") {
+			if ($state=="result") {
+				if ($fixed) {
+					$size-=strlen($atom);
+					$result.=$atom;
+					if ($size==0) {
+						$fixed=false;
+						$size=$this->socketLimit;
+					}
+					continue;
+				}
+
 				// Look for $this->errorStart
 				$pos=strpos($this->tail.$atom,$this->errorStart);
 
@@ -132,8 +168,8 @@ class Octave_client
 					// Clip $atom to error start
 					$atom=substr($atom,$pos-strlen($this->tail)+$ESlen);
 
-					// Switch to error mode
-					$mode="error";
+					// Switch to error state
+					$state="error";
 				} else {
 
 					// Append the old tail and the atom, minus the new tail
@@ -144,10 +180,10 @@ class Octave_client
 				}
 			}
 
-			if ($mode=="error") {
+			if ($state=="error") {
 				$this->lastError.=$atom;
 				if (substr($this->lastError,-$MElen)==$this->msgEnd) {
-					$this->lastErrort=substr($this->lastError,0,-$MElen);
+					$this->lastError=substr($this->lastError,0,-$MElen);
 					return $result;
 				}
 			}
