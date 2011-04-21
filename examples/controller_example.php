@@ -7,7 +7,7 @@
 */
 
 /**
-* Include the server library.
+* The octave-daemon library.
 */
 require dirname(dirname(__FILE__))."/server/include/Octave_server_lib.php";
 $c=new Octave_controller();

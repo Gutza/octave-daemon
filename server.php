@@ -28,7 +28,7 @@
 */
 
 /**
-* The main octave-daemon-server library.
+* The main octave-daemon library.
 */
 require "include/Octave_lib.php";
 
