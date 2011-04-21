@@ -92,7 +92,10 @@ class Octave_client
 		if (!$this->_send("retr ".$filename."\n"))
 			return false;
 
+		$pp=$this->partialProcessing;
+		$this->partialProcessing=false;
 		$size=$this->_read();
+		$this->partialProcessing=$pp;
 		if ($this->lastError)
 			return false;
 
@@ -209,6 +212,7 @@ class Octave_client
 			$this->partialProcessing=false;
 			return;
 		}
+		$this->partialProcessing=true;
 		$this->partialHandler=$handler;
 	}
 
