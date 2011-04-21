@@ -35,7 +35,7 @@
 class Octave_client_socket
 {
 	public $errorStart="<od-err>\n";
-	public $msgEnd="\0";
+	public $msgEnd="<od-end>\n";
 	public $pid=0;
 	public $socketLimit=1048576;
 
@@ -128,14 +128,37 @@ class Octave_client_socket
 		}
 	}
 
+	public function sendError($message)
+	{
+		return $this->respond(array(
+			'response'=>'',
+			'error'=>$message,
+			'partial'=>false
+		));
+	}
+
+	protected function sendFile($filename)
+	{
+		if (!file_exists($filename) || !is_readable($filename))
+			return $this->sendError("File doesn't exist: ".$filename);
+
+		$this->write(filesize($filename).$this->errorStart,false);
+		$fp=@fopen($filename,'r');
+		while(!feof($fp)) {
+			$str=fread($fp,102400); // 100 KB at a time
+			$this->write($str,true);
+		}
+		$this->write($this->errorStart,false);
+		fclose($fp);
+	}
+
 	protected function processCommand($cmd,$payload)
 	{
-		if (!in_array($cmd,array('query','runRead','run')))
-			return $this->respond(array(
-				'response'=>'',
-				'error'=>"Unknown command: ".$cmd,
-				'partial'=>false
-			));
+		if (!in_array($cmd,array('query','runRead','run','retr')))
+			return $this->sendError("Unknown command: ".$cmd);
+
+		if ($cmd=='retr')
+			return $this->sendFile($payload);
 
 		$this->respond(array(
 			'response'=>$this->controller->$cmd($payload),
