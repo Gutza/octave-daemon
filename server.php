@@ -30,7 +30,7 @@
 /**
 * The main octave-daemon-server library.
 */
-require "include/Octave_server_lib.php";
+require "include/Octave_lib.php";
 
 $server=new Octave_server_socket();
 if (!$server->init()) {
