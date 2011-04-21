@@ -1,12 +1,27 @@
 <?php
 
-require dirname(dirname(__FILE__))."/include/Octave_client_lib.php";
+require dirname(dirname(__FILE__))."/include/Octave_lib.php";
 
 $client=new Octave_client();
 if (!$client->init()) {
 	echo "Failed initializing client!\nThe error message was \"".$client->lastError."\"\n";
 	exit;
 }
+
+$fp=fopen("delme.file",'w');
+$client->registerPartialHandler("ph");
+$client->retrieve("/home/bogdan/delme/octave.mat");
+fclose($fp);
+
+function ph($content,$partial)
+{
+	global $fp;
+	fputs($fp,$content);
+}
+
+echo "Errors: [".$client->lastError."]\n";
+
+return;
 
 $lines=10000;
 $columns=100;

@@ -2,7 +2,7 @@
 /**
 * Octave-daemon -- a network daemon for Octave, written in PHP
 *
-* This is the main server library. It just registers the SPL autoloader.
+* This is the main client library. It just registers the SPL autoloader.
 *
 * Copyright (C) 2011 Bogdan Stancescu <bogdan@moongate.ro>
 *
@@ -20,7 +20,7 @@
 * along with this program.  If not, see {@link http://www.gnu.org/licenses/}.
 *
 * @package octave-daemon
-* @subpackage server
+* @subpackage common
 * @author Bogdan Stăncescu <bogdan@moongate.ro>
 * @version 1.0
 * @copyright Copyright (c) 2011, Bogdan Stăncescu
@@ -30,7 +30,7 @@
 /**
 * The SPL autoloader.
 */
-function Octave_server_autoloader($class_name)
+function Octave_autoloader($class_name)
 {
 	$filename=dirname(__FILE__).'/classes/'.$class_name.'.php';
 	if (file_exists($filename)) {
@@ -40,4 +40,4 @@ function Octave_server_autoloader($class_name)
 	return false;
 }
 
-spl_autoload_register('Octave_server_autoloader',false);
+spl_autoload_register('Octave_autoloader',false);
