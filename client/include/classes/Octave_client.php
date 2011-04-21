@@ -49,6 +49,7 @@ class Octave_client
 		"quit"
 	);
 	private $tail="";
+	private $partialProcessing=false;
 
 	public function init()
 	{
@@ -149,11 +150,17 @@ class Octave_client
 			if ($state=="result") {
 				if ($fixed) {
 					$size-=strlen($atom);
-					$result.=$atom;
+
 					if ($size==0) {
 						$fixed=false;
 						$size=$this->socketLimit;
 					}
+
+					if ($this->partialProcessing)
+						$this->partialProcess($atom,$fixed);
+					else
+						$result.=$atom;
+
 					continue;
 				}
 
@@ -161,8 +168,12 @@ class Octave_client
 				$pos=strpos($tail.$atom,$this->errorStart);
 
 				if ($pos!==false) {
-					// Append tail and atom up to error start
-					$result.=$tail.substr($atom,0,$pos-strlen($tail));
+					$atomPart=$tail.substr($atom,0,$pos-strlen($tail));
+
+					if ($this->partialProcessing)
+						$this->partialProcess($atomPart,false);
+					else
+						$result.=$atomPart;
 
 					// Clip $atom to error start
 					$atom=substr($atom,$pos-strlen($tail)+$ESlen);
@@ -170,9 +181,12 @@ class Octave_client
 					// Switch to error state
 					$state="error";
 				} else {
+					$atomPart=substr($tail.$atom,0,-$ESlen);
 
-					// Append the old tail and the atom, minus the new tail
-					$result.=substr($tail.$atom,0,-$ESlen);
+					if ($this->partialProcessing)
+						$this->partialProcess($atomPart,true);
+					else
+						$result.=$atomPart;
 
 					// Populate the tail
 					$tail=substr($result.$tail.$atom,-$ESlen);
