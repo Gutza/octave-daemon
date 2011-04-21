@@ -48,6 +48,7 @@ class Octave_client
 		"query",
 		"quit"
 	);
+	private $tail="";
 
 	public function init()
 	{
@@ -99,8 +100,6 @@ class Octave_client
 			return false;
 		}
 
-echo "Size=".$size."\n";
-
 		return $this->_read($size);
 	}
 
@@ -130,7 +129,7 @@ echo "Size=".$size."\n";
 	private function _read($size=NULL)
 	{
 		$state="result";
-		$result=$this->lastError=$this->tail="";
+		$result=$this->lastError=$tail="";
 		$MElen=strlen($this->msgEnd);
 		$ESlen=strlen($this->errorStart);
 
@@ -159,24 +158,24 @@ echo "Size=".$size."\n";
 				}
 
 				// Look for $this->errorStart
-				$pos=strpos($this->tail.$atom,$this->errorStart);
+				$pos=strpos($tail.$atom,$this->errorStart);
 
 				if ($pos!==false) {
 					// Append tail and atom up to error start
-					$result.=$this->tail.substr($atom,0,$pos-strlen($this->tail));
+					$result.=$tail.substr($atom,0,$pos-strlen($tail));
 
 					// Clip $atom to error start
-					$atom=substr($atom,$pos-strlen($this->tail)+$ESlen);
+					$atom=substr($atom,$pos-strlen($tail)+$ESlen);
 
 					// Switch to error state
 					$state="error";
 				} else {
 
 					// Append the old tail and the atom, minus the new tail
-					$result.=substr($this->tail.$atom,0,-$ESlen);
+					$result.=substr($tail.$atom,0,-$ESlen);
 
 					// Populate the tail
-					$this->tail=substr($result.$this->tail.$atom,-$ESlen);
+					$tail=substr($result.$tail.$atom,-$ESlen);
 				}
 			}
 
