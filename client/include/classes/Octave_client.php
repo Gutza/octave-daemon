@@ -64,7 +64,7 @@ class Octave_client
 			return false;
 		}
 
-		$this->_read("error");
+		$this->_read();
 
 		return true;
 	}
@@ -108,8 +108,9 @@ class Octave_client
 		return true;
 	}
 
-	private function _read($mode="result")
+	private function _read()
 	{
+		$mode="result";
 		$result=$this->lastError=$this->tail="";
 		$MElen=strlen($this->msgEnd);
 		$ESlen=strlen($this->errorStart);
@@ -134,11 +135,12 @@ class Octave_client
 					// Switch to error mode
 					$mode="error";
 				} else {
-					// Populate the tail
-					$this->tail=substr($this->tail.$atom.$result,-$ESlen);
 
 					// Append the old tail and the atom, minus the new tail
 					$result.=substr($this->tail.$atom,0,-$ESlen);
+
+					// Populate the tail
+					$this->tail=substr($result.$this->tail.$atom,-$ESlen);
 				}
 			}
 

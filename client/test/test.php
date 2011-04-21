@@ -8,12 +8,36 @@ if (!$client->init()) {
 	exit;
 }
 
-$start=microtime(true);
-$result=trim($client->query("eye(1000)"));
-echo count(explode("\n",$result));
-echo " (".number_format(strlen($result)/1024/1024,2)." MiB)\n";
+$lines=10000;
+$columns=100;
 
-//echo $client->query("sum(sum(rand(1000)))");
+$start=microtime(true);
+$result=trim($client->query("rand($lines,$columns)"));
+
+$xploded=explode("\n",$result);
+$count=count($xploded);
+echo "Received ".number_format(strlen($result)/1024/1024,2)." MiB\n";
+
+for($lid=0;$lid<$lines;$lid++) {
+	if (!isset($xploded[$lid])) {
+		echo "Line ".($lid+1)." is missing altogether!\n";
+		continue;
+	}
+	$line=explode(" ",trim($xploded[$lid]));
+	if (count($line)!=$columns) {
+		for($i=$lid-1;$i<$lid+2;$i++)
+			echo "Line ".($i+1).": ".$xploded[$i]."\n";
+	}
+}
+if ($count==$lines)
+	echo "Line count ok.\n";
+
+for($lid=$lines;$lid<$count;$lid++)
+	echo "Extra line ".($lid+1).": ".$xploded[$lid]."\n";
+
+//echo $result;
+
+//echo $client->query("sum(sum(rand($lines)))");
 
 $end=microtime(true);
 
