@@ -30,7 +30,7 @@
 * @package octave-daemon
 * @subpackage client
 */
-class Octave_client
+class Octave_client implements iOctave_protocol
 {
 
 	public $server_address='127.0.0.1';

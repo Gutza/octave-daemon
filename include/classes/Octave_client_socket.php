@@ -32,7 +32,7 @@
 * @package octave-daemon
 * @subpackage server
 */
-class Octave_client_socket
+class Octave_client_socket implements iOctave_protocol
 {
 	public $errorStart="<od-err>\n";
 	public $msgEnd="<od-end>\n";
