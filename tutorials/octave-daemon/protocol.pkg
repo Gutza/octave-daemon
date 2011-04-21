@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<refentry id="{@id}">
+<refentry id="{@id proto}">
   <refmeta>
     <refentrytitle></refentrytitle>
 
@@ -20,7 +20,7 @@
     </cmdsynopsis>
   </refsynopsisdiv>
 
-  <refsect1 id="{@id desc}">
+  <refsect1 id="{@id proto_desc}">
     <title>Description</title>
 
     <para>The network protocol is basically plain text, but allows for binary
@@ -29,7 +29,7 @@
     that, the server waits for the client to send a client message, to which
     the server responds with a server message, and so on.</para>
 
-    <refsect2 id="{@id server_msg}">
+    <refsect2 id="{@id proto_server_msg}">
       <title>Server messages</title>
 
       <para>All messages from the server must follow this format:</para>
@@ -56,7 +56,7 @@
       both separators must always be present.</para>
     </refsect2>
 
-    <refsect2 id="{@id client_msg}">
+    <refsect2 id="{@id proto_client_msg}">
       <title>Client messages</title>
 
       <para>All messages from the client must follow this format:</para>
