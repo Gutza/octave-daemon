@@ -50,11 +50,8 @@ class Octave_configuration extends Octave_IP_processor
 		),
 	);
 
-	public function __construct($filename=NULL)
+	public function __construct($filename)
 	{
-		if ($filename===NULL)
-			$filename=dirname(dirname(dirname(__FILE__)))."/octave-daemon.conf";
-
 		$this->lastError="Failed reading configuration file $filename";
 		if (
 			$this->readConf($filename) &&
