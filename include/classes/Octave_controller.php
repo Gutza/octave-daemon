@@ -174,13 +174,20 @@ class Octave_controller extends Octave_partial_processor
 	*/
 	protected $octave_cursor="<od-msg-end>";
 
-	/*
+	/**
 	* Used internally in {@link _return()} to track the Octave
 	* prompt when {@link $allowPartial} is enabled.
 	*
 	* @var string
 	*/
 	private $tail="";
+
+	/**
+	* Whether this instance has been initialized
+	*
+	* @var boolean
+	*/
+	protected $initialized=false;
 
 	/**
 	* The class constructor.
@@ -232,6 +239,9 @@ class Octave_controller extends Octave_partial_processor
 	*/
 	public function init()
 	{
+		if ($this->initialized)
+			return NULL;
+
 		$this->process=proc_open(
 			$this->octave_path.$this->octave_binary." -i",
 			array(
@@ -270,6 +280,8 @@ class Octave_controller extends Octave_partial_processor
 			throw new RuntimeException("Unrecognized welcome message from Octave:\n{\n".$welcome."}");
 
 		$this->octave_version=$matches[1];
+		$this->initialized=true;
+		return true;
 	}
 
 	/**
