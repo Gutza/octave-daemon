@@ -11,12 +11,23 @@ class commonTests extends PHPUnit_Framework_TestCase
 		return self::$octave===NULL;
 	}
 
+	public function testInitialize()
+	{
+		$this->assertContains(self::$octave->init(),array(NULL,true));
+	}
+
+	/**
+	* @depends testInitialize
+	*/
 	public function testRunReadArithmetic()
 	{
 		$result=self::$octave->runRead("disp(5+5)");
 		$this->assertEquals("10",rtrim($result));
 	}
 
+	/**
+	* @depends testInitialize
+	*/
 	public function testRunReadWarning()
 	{
 		self::$octave->quiet=true;
@@ -25,6 +36,9 @@ class commonTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals("warning: division by zero",trim(self::$octave->lastError));
 	}
 
+	/**
+	* @depends testInitialize
+	*/
 	public function testRunReadError()
 	{
 		self::$octave->quiet=true;
@@ -33,11 +47,17 @@ class commonTests extends PHPUnit_Framework_TestCase
 		$this->assertStringStartsWith("error: `qwerty' undefined near line ",self::$octave->lastError);
 	}
 
+	/**
+	* @depends testInitialize
+	*/
 	public function testQueryArithmetic()
 	{
 		$this->assertEquals("10",rtrim(self::$octave->query("5+5")));
 	}
 
+	/**
+	* @depends testInitialize
+	*/
 	public function testQueryWarning()
 	{
 		self::$octave->quiet=true;
@@ -46,6 +66,9 @@ class commonTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals("warning: division by zero",trim(self::$octave->lastError));
 	}
 
+	/**
+	* @depends testInitialize
+	*/
 	public function testQueryError()
 	{
 		self::$octave->quiet=true;
@@ -54,6 +77,9 @@ class commonTests extends PHPUnit_Framework_TestCase
 		$this->assertStringStartsWith("error: `qwerty' undefined near line ",self::$octave->lastError);
 	}
 
+	/**
+	* @depends testInitialize
+	*/
 	public function testSlow()
 	{
 		self::$octave->run("
@@ -77,6 +103,9 @@ class commonTests extends PHPUnit_Framework_TestCase
 		$this->assertEmpty(self::$octave->lastError);
 	}
 
+	/**
+	* @depends testInitialize
+	*/
 	public function testLargeReadWrite()
 	{
 		$size=1000; // Mind you, this is $size * $size cells (1M cells, ~2M bytes for this setup)
@@ -102,6 +131,9 @@ class commonTests extends PHPUnit_Framework_TestCase
 		$this->assertEquals($size,count(explode(" ",trim($lines[$size-1]))));
 	}
 
+	/**
+	* @depends testInitialize
+	*/
 	public function testSequential()
 	{
 		self::$octave->quiet=true;
