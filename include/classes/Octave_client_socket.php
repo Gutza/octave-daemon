@@ -87,7 +87,7 @@ class Octave_client_socket implements iOctave_protocol
 			$message.=self::error_end;
 
 		$msgLength=strlen($message);
-		
+
 		return $msgLength==@socket_write($this->socket,$message,$msgLength);
 	}
 
@@ -159,7 +159,7 @@ class Octave_client_socket implements iOctave_protocol
 		if ($cmd=='retr')
 			return $this->sendFile($payload);
 
-		$this->respond(array(
+		return $this->respond(array(
 			'response'=>$this->controller->$cmd($payload),
 			'error'=>$this->controller->lastError,
 			'partial'=>$this->controller->partialResult
@@ -168,25 +168,22 @@ class Octave_client_socket implements iOctave_protocol
 
 	private function respond($response)
 	{
-		$previousPartial=false;
-
-		do {
+		while (true) {
 			$partial=$response['partial'];
 
 			// This is partial, because the errors always follow
 			if (!$this->write($response['response'],true))
 				return false;
 
-			if ($partial) {
-				$response=array(
-					'response'=>$this->controller->more(),
-					'error'=>$this->controller->lastError,
-					'partial'=>$this->controller->partialResult
-				);
-			} else
+			if (!$partial)
 				return $this->write(self::error_start.$response['error'],$partial);
 
-		} while($partial);
+			$response=array(
+				'response'=>$this->controller->more(),
+				'error'=>$this->controller->lastError,
+				'partial'=>$this->controller->partialResult
+			);
+		};
 	}
 
 }
