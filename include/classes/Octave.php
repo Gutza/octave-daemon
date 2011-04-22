@@ -36,6 +36,7 @@
 * @subpackage client
 */
 class Octave
+	implements iOctave_network
 {
 	public $lastError="";
 	public $quiet=false;
@@ -43,7 +44,9 @@ class Octave
 	protected $connector=NULL;
 	protected $connectorMethods=array();
 
-	public function __construct($connect,$port=NULL)
+	protected $initialized=false;
+
+	public function __construct($connect,$port=self::default_port)
 	{
 		switch(gettype($connect)) {
 			case "string":
@@ -53,21 +56,35 @@ class Octave
 				$this->connector=new Octave_controller();
 				break;
 			case "object":
-				if (!$connect instanceof iOctave_connector)
-					throw new RuntimeException("The connector must implement iOctave_connector!");
 				$this->connector=$connect;
 				break;
 			default:
-				throw new RuntimeException("Unknown connect type: ".gettype($connect));
+				throw new RuntimeException("Unknown connection type: ".gettype($connect));
 		}
-		$this->connector->init();
+	}
+
+	function init()
+	{
+		if ($this->initialized)
+			return NULL;
+
+		if (!$this->connector instanceof iOctave_connector)
+			throw new RuntimeException("The connector must implement iOctave_connector!");
+		if (!$this->connector->init())
+			return false;
+
 		$this->connectorMethods=get_class_methods("iOctave_connector");
+
+		return $this->initialized=true;
 	}
 
 	public function __call($method,$payload)
 	{
 		if (!in_array($method,$this->connectorMethods))
 			throw new RuntimeException("Unknown method: ".$method);
+
+		if ($this->init()===false)
+			return false;
 
 		$this->connector->quiet=$this->quiet;
 		$result=$this->connector->$method($payload[0]);
