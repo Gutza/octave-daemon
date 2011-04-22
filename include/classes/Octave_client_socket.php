@@ -166,7 +166,7 @@ class Octave_client_socket implements iOctave_protocol
 		));
 	}
 
-	private function respond($response)
+	protected function respond($response)
 	{
 		while (true) {
 			$partial=$response['partial'];

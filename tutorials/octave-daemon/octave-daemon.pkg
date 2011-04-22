@@ -21,8 +21,8 @@
     </cmdsynopsis>
   </refsynopsisdiv>
 
-  <refsection>
-    <title>Description</title>
+  <refsect1 id="{@id overview}">
+    <title>Overview</title>
 
     <para>{@link http://www.gnu.org/software/octave/ GNU Octave} is an
     extremely fast solution for large, complex numerical computations. For
@@ -30,26 +30,28 @@
     perfectly acceptable. However, for larger projects, running new Octave
     instances for each processing operation can become inefficient.</para>
 
-    <para>This daemon is meant to address the following issues with the ad hoc
-    approach:</para>
+    <para>This daemon features the following advantages over the ad hoc approach:</para>
 
     <itemizedlist>
       <listitem>
-        <para>Octave processes are persistent, which means that any data that
-        has been loaded or computed in the past will still be available for
-        newly-connected clients;</para>
-      </listitem>
-
-      <listitem>
-        <para>Octave processes are persistent, which means that all startup
-        times for new Octave processes don't affect clients;</para>
-      </listitem>
-
-      <listitem>
         <para>The daemon is accessible via network, which means you can move
         all Octave processes on a separate server, should you decide you need
-        to.</para>
+        to;</para>
       </listitem>
+
+      <listitem>
+        <para>Octave processes are persistent, which means that:</para>
+           <itemizedlist>
+             <listitem>
+               <para>any data that has been loaded or computed in the past
+               will still be available for newly-connected clients;</para>
+            </listitem>
+
+            <listitem>
+              <para>startup times for new Octave processes don't affect clients.</para>
+           </listitem>
+         </itemizedlist>
+       </listitem>
     </itemizedlist>
 
     <para>In addition, the Octave daemon package also implements the following
@@ -71,6 +73,37 @@
         arrays.</para>
       </listitem>
     </itemizedlist>
-  </refsection>
+
+    <refsect2 id="{@id caveats}">
+      <title>Caveats</title>
+
+      <para>You should be aware of the following before considering if and how to use
+      this daemon in production:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>There is no security in place. There is no authentication, there are
+          no disk, CPU time or memory quotas, and the {@link Octave_client::retrieve() retr}
+          command can be used to retrieve any file on the server. The only security provision
+          in place is the {@link Octave_server_socket::$allowedIP basic IP filter} in
+          the server; and even that is very crudely implemented, you shouldn't
+          rely solely on that feature.</para>
+        </listitem>
+        <listitem>
+          <para>You can limit the number of Octave instances running on the server using
+          {@link Octave_pool::$maxCount}, but you can't limit the amount of memory each
+          instance gobbles up. And remember that whatever gets used, remains in use --
+          the processes are persistent, so it only takes one rogue client to mess it up
+          for everybody. It's your responsibility, as an end user, to keep things nice and
+          tidy and clean up your temporary variables (or to clean everything up once
+          in a while), using Octave's own mechanisms.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Given all of the above, this daemon is meant to be used in a closed environment
+      by automated agents -- don't open up your daemon or its clients to direct control by
+      human operators, or you know there's going to be trouble.</para>
+    </refsect2>
+  </refsect1>
 </refentry>
 

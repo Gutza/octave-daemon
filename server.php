@@ -32,6 +32,8 @@
 */
 require "include/Octave_lib.php";
 
+$daemon=Octave_daemon::getCurrent();
+
 $server=new Octave_server_socket();
 if (!$server->init()) {
 	echo "Init failed:\n";

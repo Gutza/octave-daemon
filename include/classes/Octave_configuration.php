@@ -1,6 +1,6 @@
 <?php
 
-class Octave_configuration
+class Octave_configuration extends Octave_IP_processor
 {
 
 	public $globals=array();
@@ -43,7 +43,8 @@ class Octave_configuration
 				),
 			),
 			"allowed_ip"=>array(
-				// too atypical, this is tested separately
+				"default"=>"127.0.0.1",
+				// too atypical; this is tested separately
 				"constraints"=>array(),
 			),
 		),
@@ -115,7 +116,25 @@ class Octave_configuration
 		foreach($this->servers as $idx=>$server)
 			if (!$this->processSection($this->servers[$idx],$this->values['server']))
 				return false;
+			if (!$this->processIPs($this->servers[$idx]['allowed_ip']))
+				return false;
 
+		return true;
+	}
+
+	protected function processIPs(&$ranges)
+	{
+		$list=explode(",",$ranges);
+		$final=array();
+		foreach($list as $ip)  {
+			$range=new Octave_IP_range(trim($ip));
+			if (!$range->init()) {
+				$this->lastError=$range->lastError;
+				return false;
+			}
+			$final[]=$range;
+		}
+		$ranges=$final;
 		return true;
 	}
 
@@ -157,9 +176,7 @@ class Octave_configuration
 			case "non-zero":
 				return $val!=0;
 			case "ip_address":
-				return
-					preg_match("/^([0-9]{1,3}\\.){3}[0-9]{1,3}$/",$val) ||
-					preg_match("/^([0-9a-f]{4}:){1,7}[0-9a-f]{4}$/",$val);
+				return $this->testIP($val);
 			default:
 				throw new RuntimeException("Unknown constraint type: ".$constraint);
 		}

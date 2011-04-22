@@ -40,7 +40,6 @@ class Octave_server_socket
 	public $lastError="";
 	public $allowedIP=array('127.0.0.1');
 
-	private $lockptr=NULL;
 	private $initialized=false;
 	private $socket=NULL;
 
@@ -53,17 +52,11 @@ class Octave_server_socket
 		if ($this->initialized)
 			return NULL;
 
-		if (!$this->lock()) {
-			Octave_logger::getCurrent()->log("This server is already running.",LOG_INFO);
-			return false;
-		}
-
 		$this->socket=@socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if ($this->socket===false) {
 			$this->setError($this->getSocketError(
 				"Failed creating socket"
 			),LOG_ERR);
-			$this->unlock();
 			return false;
 		}
 
@@ -72,7 +65,6 @@ class Octave_server_socket
 				"Failed binding socket to ".
 				$this->server_address.":".$this->server_port
 			),LOG_ERR);
-			$this->unlock();
 			return false;
 		}
 
@@ -80,7 +72,6 @@ class Octave_server_socket
 			$this->setError($this->getSocketError(
 				"Failed starting to listen on socket"
 			),LOG_ERR);
-			$this->unlock();
 			return false;
 		}
 
@@ -150,24 +141,4 @@ class Octave_server_socket
 		Octave_logger::getCurrent()->log($message,$priority);
 		$this->lastError=$message;
 	}
-
-	private function lock()
-	{
-		$this->lockptr=fopen(__FILE__,'r');
-		if (flock($this->lockptr,LOCK_EX+LOCK_NB))
-			return true;
-
-		fclose($this->lockptr);
-		return false;
-	}
-
-	private function unlock()
-	{		
-		if (!flock($this->lockptr,LOCK_UN))
-			return false;
-
-		fclose($this->lockptr);
-		return true;
-	}
-
 }

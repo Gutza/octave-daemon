@@ -34,7 +34,7 @@
 class Octave_pool
 {
 	static private $pool=array();
-	static public $maxCount=2;
+	static public $maxCount=3;
 	static private $pending_connections=array();
 
 	private function __construct()
