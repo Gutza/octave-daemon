@@ -95,7 +95,7 @@ class Octave_client extends Octave_partial_processor
 
 	protected function _call($method,$payload)
 	{
-		return $this->_process($method,$payload[0]);
+		return $this->_process($method,$payload);
 	}
 
 	public function retrieve($filename)

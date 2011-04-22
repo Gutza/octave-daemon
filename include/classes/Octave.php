@@ -37,9 +37,9 @@
 */
 class Octave
 {
-	private $connector=NULL;
 	public $lastError="";
 
+	protected $connector=NULL;
 	protected $connectorMethods=array();
 
 	public function __construct($connect,$port=NULL)
@@ -68,7 +68,7 @@ class Octave
 		if (!in_array($method,$this->connectorMethods))
 			throw new RuntimeException("Unknown method: ".$method);
 
-		$result=$this->connector->$method($payload);
+		$result=$this->connector->$method($payload[0]);
 		$this->lastError=$this->connector->lastError;
 		return $result;
 	}
