@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
 * Octave-daemon -- a network daemon for Octave, written in PHP
@@ -32,7 +33,9 @@
 */
 require "include/Octave_lib.php";
 
-$daemon=Octave_daemon::getCurrent();
+if (!Octave_daemon::init())
+	throw new RuntimeException(Octave_daemon::$lastError);
+return;
 
 $server=new Octave_server_socket();
 if (!$server->init()) {

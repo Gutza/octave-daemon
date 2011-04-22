@@ -3,12 +3,14 @@
 class Octave_daemon
 	implements iOctave_network
 {
+	public static $lastError="";
 
 	private static $currentInstance;
 	private static $serverPool=array();
 	private static $lockptr=NULL;
 	private static $config_file=NULL;
 	private static $config;
+	private static $daemonize=false;
 
 	private function __construct()
 	{
@@ -16,17 +18,46 @@ class Octave_daemon
 
 	public function init()
 	{
-		self::$config_file=dirname(dirname(dirname(__FILE__)))."/octave-daemon.conf";
+		self::$config_file=
+			dirname(dirname(dirname(__FILE__))).
+			"/octave-daemon.conf";
+
 		if (!self::processOptions())
 			return false;
+
+		if (!self::startServers())
+			return false;
+
+		if (self::$daemonize && !self::daemonize())
+			return false;
+
+		return true;
+	}
+
+	protected function startServers()
+	{
+		if (!count(self::$config->servers)) {
+			self::$lastError="There are no servers! Make sure you have at least one [server] section in the configuration file.";
+			return false;
+		}
+		foreach(self::$config->servers as $server) {
+			$s=new Octave_server_socket();
+			$s->server_address=$server['server_address'];
+			$s->server_port=$server['server_port'];
+echo "-> "; var_dump($server['allowed_ip']);
+			$s->allowedIP=$server['allowed_ip'];
+			if (!$s->init()) {
+				self::$lastError=$s->lastError;
+				return false;
+			}
+		}
 		return true;
 	}
 
 	protected function processOptions()
 	{
-
 		global $argv, $argc;
-		$daemonize=$use_option=false;
+		$use_option=false;
 		$option="";
 		for($i=1;$i<$argc;$i++) {
 			if ($use_option) {
@@ -36,41 +67,30 @@ class Octave_daemon
 			}
 			switch($argv[$i]) {
 				case "-d":
-					$daemonize=true;
+					self::$daemonize=true;
 					continue;
 				case "-c":
 					$option=&self::$config_file;
 					$use_option=true;
 					continue;
 				default:
-					throw new RuntimeException("Unknown option: ".$argv[$i]);
+					self::$lastError="Unknown option: ".$argv[$i];
+					return false;
 			}
 		}
 
-		if (!self::lock())
-			throw new RuntimeException("Another process has already locked this configuration file.");
-
-		self::$config=new Octave_configuration(self::$config_file);
-		if (self::$config->lastError)
-			throw new RuntimeException("Configuration error: ".self::$config->lastError);
-
-		var_dump(self::$config);
-		if ($daemonize && !self::daemonize()) {
-			Octave_logger::getCurrent()->log("Failed forking! You have to compile PHP with --enable-pcntl and run this on Unix-like platforms.");
+		if (!self::lock()) {
+			self::$lastError="Another process has already locked this configuration file.";
 			return false;
 		}
-	}
 
-	public function getCurrent()
-	{
-		if (isset(self::$currentInstance))
-			return self::$currentInstance;
-
-		if (!self::init())
+		self::$config=new Octave_configuration(self::$config_file);
+		if (self::$config->lastError) {
+			self::$lastError="Configuration error: ".self::$config->lastError;
 			return false;
+		}
+		return true;
 
-		$class=get_class(self);
-		return self::$currentInstance=new $class();
 	}
 
 	private function lock()
@@ -95,8 +115,10 @@ class Octave_daemon
 	private function daemonize()
 	{
 		$pid=pcntl_fork();
-		if ($pid==-1)
+		if ($pid==-1) {
+			self::$lastError="Failed forking! You have to compile PHP with --enable-pcntl and run this on Unix-like platforms.";
 			return false;
+		}
 
 		if ($pid)
 			// Parent
