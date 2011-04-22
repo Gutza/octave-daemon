@@ -5,7 +5,6 @@ function ensure_identity
 	# test whether standard identities have been added to the agent already
 	ssh-add -l | grep "The agent has no identities" > /dev/null
 	if [ $? -eq 0 ]; then # Nope
-		echo "From ensure_identity"
 		ssh-add && return 0 || return 1
 	fi
 	return 0
