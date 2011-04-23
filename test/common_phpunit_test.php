@@ -4,16 +4,19 @@ require dirname(dirname(__FILE__))."/include/Octave_lib.php";
 
 class commonTests extends PHPUnit_Framework_TestCase
 {
-	static $octave=NULL;
 
-	function __construct()
+	function init()
 	{
-		return self::$octave===NULL;
+		$r=new ReflectionClass($this);
+		return $r->getStaticPropertyValue("octave")===NULL;
 	}
 
 	public function testInitialize()
 	{
-		$this->assertContains(self::$octave->init(),array(NULL,true));
+		$r=new ReflectionClass($this);
+		$myOctave=$r->getStaticPropertyValue("octave");
+var_dump($myOctave);
+		$this->assertContains($myOctave->init(),array(NULL,true));
 	}
 
 	/**

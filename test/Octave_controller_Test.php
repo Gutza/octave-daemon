@@ -4,6 +4,8 @@ require_once "common_phpunit_test.php";
 
 class controllerTest extends commonTests
 {
+	static $octave=NULL;
+
 	var $partialContent="";
 	var $partialCount=0;
 
