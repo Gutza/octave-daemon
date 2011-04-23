@@ -107,6 +107,7 @@ class Octave_pool
 					$kid->close();
 				} else {
 					// Child
+					chdir(self::$home_directory);
 					$kid->entertain();
 					$kid->kill();
 					exit;

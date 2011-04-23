@@ -149,6 +149,7 @@ class Octave_client_socket implements iOctave_protocol
 		}
 		$this->write(self::error_start,false);
 		fclose($fp);
+		return true;
 	}
 
 	protected function processCommand($cmd,$payload)
