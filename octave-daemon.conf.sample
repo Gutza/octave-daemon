@@ -6,23 +6,20 @@
 # Default value: 3
 # max_instances = 3
 
-# The PID file.
-# There is no default value; this has to be specified explicitly
-# or the daemon won't start.
+# The PID file. There is no default value.
+# Required when started with -d, optional otherwise.
 pid_file = /var/run/octave_daemon.pid
 
 # The home directory for Octave instances.
-# There is no default value; this has to be specified explicitly
-# or the daemon won't start.
+# By default, the current directory is used.
 home_directory = /tmp
 
 # The user and group the daemon should run as.
-# There is no default value; this has to be specified explicitly
-# or the daemon won't start.
-# Only required when started with option -d.
+# There is no default value.
+# Only required when started as root. Probably not a good idea otherwise.
 run_as = nobody.nobody
 
-# Server section (multiple server sections allowed)
+# Server section (multiple server sections allowed, at least one required)
 [server]
 # The IP address this server should be listening to.
 # Default value: 127.0.0.1
@@ -32,7 +29,7 @@ run_as = nobody.nobody
 
 # The port this server should be listening to.
 # Default value: 43210
-# server_port = 43210
+ server_port = 43211
 
 # The allowed IP addresses or ranges. Comma-separated list.
 # Ranges can only be specified in CIDR notation (e.g. 192.168.0.0/24)
@@ -40,7 +37,7 @@ run_as = nobody.nobody
 # Default value: 127.0.0.1
 # Use 0.0.0.0/0 if you want to allow all IP addresses.
 # WARNING! Don't leave this service open for all!
-# allowed_ip = 127.0.0.1
+allowed_ip = 127.0.0.0/24
 
 # You can start multiple servers; all servers share the same instance pool.
 # For each server you must write a new server section.

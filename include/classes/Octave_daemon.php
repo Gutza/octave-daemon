@@ -29,6 +29,9 @@ class Octave_daemon
 		if (!self::startServers())
 			return false;
 
+		if (!self::changeIdentity())
+			return false;
+
 		if (self::$daemonize && !self::daemonize())
 			return false;
 
@@ -129,6 +132,56 @@ class Octave_daemon
 			usleep(100);
 		}
 
+	}
+
+	private function changeIdentity()
+	{
+		if (!function_exists("posix_getuid")) {
+			self::$lastError="Octave-daemon requires POSIX functions; please see http://www.php.net/manual/en/book.posix.php";
+			return false;
+		}
+		$root=!posix_getuid();
+		if (
+			!isset(self::$config->globals["run_as"]) ||
+			!strlen($run_as=self::$config->globals["run_as"])
+		) {
+			if ($root) {
+				self::$lastError="Octave-daemon won't run as root. Either run as a different user or specify the user in the configuration (option run_as)";
+				return false;
+			}
+			return true;
+		}
+
+		$xploded=explode(".",$run_as);
+		if (count($xploded)!=2) {
+			self::$lastError="Configuration error: run_as must be <user name>.<group name>; it now contains \"".$run_as."\"";
+			return false;
+		}
+
+		class_exists("Octave_controller");
+		class_exists("Octave_client_socket");
+
+		$uinfo=posix_getpwnam($xploded[0]);
+		if (!$uinfo) {
+			self::$lastError="Configuration error: Invalid user name in run_as (".$xploded[0].")";
+			return false;
+		}
+
+		$ginfo=posix_getgrnam($xploded[1]);
+		if (!$ginfo) {
+			self::$lastError="Configuration error: Invalid group name in run_as (".$xploded[1].")";
+			return false;
+		}
+
+		if (!posix_setgid($ginfo['gid'])) {
+			self::$lastError="Configuration error: Failed setting group to ".$xploded[1];
+			return false;
+		}
+		if (!posix_setuid($uinfo['uid'])) {
+			self::$lastError="Configuration error: Failed setting user to ".$xploded[0];
+			return false;
+		}
+		return true;
 	}
 
 	private function daemonize()
