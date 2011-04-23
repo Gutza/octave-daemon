@@ -90,6 +90,7 @@ class Octave_daemon
 			self::$lastError="Configuration error: ".self::$config->lastError;
 			return false;
 		}
+		Octave_pool::$home_directory=self::$config->globals["home_directory"];
 		return true;
 
 	}

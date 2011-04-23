@@ -36,6 +36,7 @@ class Octave_pool
 	static private $pool=array();
 	static public $maxCount=3;
 	static private $pending_connections=array();
+	static public $home_directory="";
 
 	private function __construct()
 	{
@@ -55,7 +56,13 @@ class Octave_pool
 	private function registerChild($cSocket)
 	{
 		$controller=new Octave_controller();
-		$controller->init();
+		$controller->cwd=self::$home_directory;
+		try {
+			$controller->init();
+		} catch(Exception $e) {
+			Octave_logger::log("Failed starting Octave controller: ".$e->message);
+			return false;
+		}
 		$kid=new Octave_client_socket($controller);
 		$kid->initSocket($cSocket);
 		self::$pool[]=$kid;
