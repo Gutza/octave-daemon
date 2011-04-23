@@ -11,6 +11,7 @@ class Octave_daemon
 	private static $config_file=NULL;
 	private static $config;
 	private static $daemonize=false;
+	private static $servers=array();
 
 	private function __construct()
 	{
@@ -44,12 +45,12 @@ class Octave_daemon
 			$s=new Octave_server_socket();
 			$s->server_address=$server['server_address'];
 			$s->server_port=$server['server_port'];
-echo "-> "; var_dump($server['allowed_ip']);
-			$s->allowedIP=$server['allowed_ip'];
+			$s->allowed_ranges=$server['allowed_ip'];
 			if (!$s->init()) {
 				self::$lastError=$s->lastError;
 				return false;
 			}
+			self::$servers[]=$s;
 		}
 		return true;
 	}
@@ -110,6 +111,23 @@ echo "-> "; var_dump($server['allowed_ip']);
 
 		fclose(self::$lockptr);
 		return true;
+	}
+
+	public function run()
+	{
+		declare(ticks = 1); 
+		pcntl_signal(SIGCHLD, array('Octave_pool','deadChild'));
+
+		while(true) {
+			foreach(self::$servers as $server) {
+				while($sock=$server->accept_connection())
+					Octave_pool::newConnection($sock);
+
+				Octave_pool::manageConnections();
+			}
+			usleep(100);
+		}
+
 	}
 
 	private function daemonize()

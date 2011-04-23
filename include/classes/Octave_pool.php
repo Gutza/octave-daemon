@@ -85,7 +85,7 @@ class Octave_pool
 		self::$pending_connections[]=$socket;
 	}
 
-	public function manageConnections($server)
+	public function manageConnections()
 	{
 		$still_waiting=array();
 		foreach(self::$pending_connections as $cSocket) {

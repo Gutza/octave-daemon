@@ -35,23 +35,6 @@ require "include/Octave_lib.php";
 
 if (!Octave_daemon::init())
 	throw new RuntimeException(Octave_daemon::$lastError);
+Octave_daemon::run();
 return;
-
-$server=new Octave_server_socket();
-if (!$server->init()) {
-	echo "Init failed:\n";
-	echo $server->lastError."\n";
-	exit;
-}
-
-declare(ticks = 1); 
-pcntl_signal(SIGCHLD, array('Octave_pool','deadChild'));
-
-while(true) {
-	while($sock=$server->accept_connection())
-		Octave_pool::newConnection($sock);
-
-	Octave_pool::manageConnections($server);
-	usleep(100);
-}
 

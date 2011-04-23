@@ -38,7 +38,7 @@ class Octave_server_socket
 	public $server_address='127.0.0.1';
 	public $server_port=self::default_port;
 	public $lastError="";
-	public $allowedIP=array('127.0.0.1');
+	public $allowed_ranges=NULL;
 
 	private $initialized=false;
 	private $socket=NULL;
@@ -114,13 +114,22 @@ class Octave_server_socket
 		}
 
 		// IP filtering, if enabled
-		if ($this->allowedIP && !in_array($remote_IP,$this->allowedIP)) {
+		if (!$this->allow_ip($remote_IP)) {
 			Octave_logger::getCurrent()->log("Connection attempt from ".$remote_IP);
 			socket_close($cSocket);
 			return NULL;
 		}
 
 		return $cSocket;
+	}
+
+	protected function allow_ip($ip)
+	{
+		foreach($this->allowed_ranges as $range) {
+			if ($range->is_allowed($ip))
+				return true;
+		}
+		return false;
 	}
 
 	public function close()
