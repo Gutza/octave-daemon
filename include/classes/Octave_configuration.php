@@ -18,13 +18,13 @@ class Octave_configuration extends Octave_IP_processor
 				),
 			),
 			"pid_file"=>array(
-				"constraints"=>array("mandatory"),
+				"constraints"=>array(),
 			),
 			"home_directory"=>array(
 				"constraints"=>array("mandatory"),
 			),
 			"run_as"=>array(
-				"constraints"=>array("mandatory"),
+				"constraints"=>array(),
 			),
 		),
 		"server"=>array(

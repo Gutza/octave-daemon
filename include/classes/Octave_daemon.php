@@ -121,6 +121,7 @@ class Octave_daemon
 	{
 		declare(ticks = 1); 
 		pcntl_signal(SIGCHLD, array('Octave_pool','deadChild'));
+		pcntl_signal(SIGTERM, array('Octave_pool','killAll'));
 
 		while(true) {
 			foreach(self::$servers as $server) {

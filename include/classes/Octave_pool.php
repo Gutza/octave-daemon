@@ -82,9 +82,17 @@ class Octave_pool
 	public function deadChild($sig)
 	{
 		$pid=pcntl_waitpid(-1,$status);
-		foreach(self::$pool as $kid)
+		foreach(self::$pool as $kid) {
 			if ($kid->processFuneral($pid))
 				break;
+		}
+	}
+
+	public function killAll($sig)
+	{
+		foreach(self::$pool as $kid)
+			$kid->kill();
+		exit;
 	}
 
 	public function newConnection($socket)
@@ -109,7 +117,7 @@ class Octave_pool
 					// Child
 					chdir(self::$home_directory);
 					$kid->entertain();
-					$kid->kill();
+					$kid->killSocket();
 					exit;
 				}
 			} else

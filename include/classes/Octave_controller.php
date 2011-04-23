@@ -208,6 +208,11 @@ class Octave_controller extends Octave_partial_processor
 	*/
 	public function __destruct()
 	{
+		$stat=proc_get_status($this->process);
+		if (!$stat['running'])
+			// Already dead
+			return;
+
 		if ($this->hangingProcess) {
 			$this->_closePipes();
 			return;

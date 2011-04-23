@@ -50,6 +50,7 @@ class Octave_client_socket implements iOctave_protocol
 
 	public function initSocket($socket)
 	{
+		socket_set_nonblock($socket);
 		$this->socket=$socket;
 	}
 
@@ -57,10 +58,22 @@ class Octave_client_socket implements iOctave_protocol
 	{
 	}
 
+	public function killSocket()
+	{
+		socket_shutdown($this->socket); // fugly: if the client dies while waiting for a connection, we just go through the usual hoops
+		$this->close();
+	}
+
 	public function kill()
 	{
-		@socket_shutdown($this->socket); // fugly: if the client dies while waiting for a connection, we just go through the usual hoops
-		$this->close();
+		if ($this->pid) {
+			posix_kill($this->pid,SIGTERM);
+			return;
+		}
+		$this->controller->hangingProcess=false;
+		$this->controller->__destruct();
+		$this->killSocket();
+		exit;
 	}
 
 	public function close()
@@ -95,6 +108,11 @@ class Octave_client_socket implements iOctave_protocol
 	{
 		$result="";
 		while(substr($result,-1)!="\n") {
+			$rd=array($this->socket);
+			if (!socket_select($rd,$N1=NULL,$N2=NULL,0)) {
+				usleep(100);
+				continue;
+			}
 			$atom=@socket_read($this->socket, $this->socketLimit);
 			if ($atom===false || $atom==="")
 				// Client exited (empty lines are "\n", not "")
