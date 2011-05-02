@@ -1,0 +1,139 @@
+#!/usr/bin/php
+<?php
+/**
+* Octave-daemon -- a network daemon for Octave, written in PHP
+*
+* This is the installation script.
+*
+* Copyright (C) 2011 Bogdan Stancescu <bogdan@moongate.ro>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program.  If not, see {@link http://www.gnu.org/licenses/}.
+*
+* @package octave-daemon
+* @subpackage server
+* @author Bogdan Stăncescu <bogdan@moongate.ro>
+* @version 1.0
+* @copyright Copyright (c) 2011, Bogdan Stăncescu
+* @license http://www.gnu.org/licenses/agpl-3.0.html GNU Affero GPL
+*/
+
+$target="/usr/bin/octave-daemon";
+
+chdir(dirname(dirname(__FILE__)));
+
+// Make sure we run this as root
+$me=trim(`whoami`);
+if ($me!='root') {
+	echo "You need to run this as root (you're now $me).\n";
+	exit(1);
+}
+
+// Test whether we can find the Octave binary
+if (!exec("which octave 2>/dev/null")) {
+	$answer=getCLI(
+		"The GNU Octave binary was not found using `which'.\n".
+		"Are you sure you want to continue? [y/N] "
+	);
+	if (strtoupper(trim($answer))!='Y')
+		exit;
+}
+
+// The classes that we need to compile
+$classes=array(
+	"Octave_daemon",
+	"Octave_partial_processor",
+	"iOctave_network",
+	"Octave_configuration",
+	"Octave_IP_processor",
+	"Octave_IP_range",
+	"Octave_pool",
+	"Octave_server_socket",
+	"Octave_controller",
+	"iOctave_connector",
+	"Octave_client_socket",
+	"iOctave_protocol",
+);
+
+// Generate the temporary file
+$tmp_fname=tempnam("/tmp","octave_installer");
+$tmp=fopen($tmp_fname,'w');
+if (!$tmp)
+	exit(3);
+
+// Build the code
+fputs($tmp,"<?php\n");
+foreach($classes as $class) {
+	$fp=fopen("include/classes/$class.php","r");
+	if (!$fp)
+		exit(2);
+	$started=false;
+	while(!feof($fp)) {
+		$line=fgets($fp);
+		if (!$started) {
+			if (
+				substr($line,0,8)!='abstract' &&
+				substr($line,0,5)!='class' &&
+				substr($line,0,9)!='interface'
+			)
+				continue;
+			$started=true;
+		}
+		fputs($tmp,$line);
+	}
+}
+fclose($tmp);
+exec("cat ".dirname(__FILE__)."/install-suffix.php >> ".$tmp_fname);
+
+// Clean up the code
+if (!exec("php -w ".$tmp_fname,$code))
+	exit(4);
+
+// Start over with the comments at the top
+copy(dirname(__FILE__)."/install-prefix.php",$tmp_fname);
+
+// Append the clean code
+$tmp=fopen($tmp_fname,'a');
+fputs($tmp,$code[1]);
+fclose($tmp);
+
+// Check that the target directory exists
+if (!is_dir(dirname($target))) {
+	echo "This install script is trying to install file octave-binary in ".dirname($target).".\n";
+	echo "Your system doesn't contain that path; aborting.\n";
+	echo "Please manually move ".$tmp_fname." somewhere in your system's path.\n";
+	exit(5);
+}
+
+// Check that the target file DOESN'T exist
+if (file_exists($target)) {
+	$answer=getCLI("File ".$target." already exists; do you want to overwrite it? [y/N] ");
+	if (strtoupper(trim($answer))!='Y')
+		exit(6);
+	unlink($target);
+}
+
+// Move the code in /usr/lib/
+rename($tmp_fname,$target);
+chmod($target,0755);
+
+echo "Octave daemon now available in ".$target."\n";
+
+function getCLI($prompt)
+{
+	echo $prompt;
+	$fp=fopen ("php://stdin","r");
+	$answer=fgets($fp);
+	fclose($fp);
+	return $answer;
+}
