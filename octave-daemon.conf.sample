@@ -29,7 +29,7 @@ home_directory = /tmp
 
 # The port this server should be listening to.
 # Default value: 43210
- server_port = 43211
+# server_port = 43210
 
 # The allowed IP addresses or ranges. Comma-separated list.
 # Ranges can only be specified in CIDR notation (e.g. 192.168.0.0/24)
@@ -37,7 +37,7 @@ home_directory = /tmp
 # Default value: 127.0.0.1
 # Use 0.0.0.0/0 if you want to allow all IP addresses.
 # WARNING! Don't leave this service open for all!
-allowed_ip = 127.0.0.0/24
+# allowed_ip = 127.0.0.1
 
 # You can start multiple servers; all servers share the same instance pool.
 # For each server you must write a new server section.
