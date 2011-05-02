@@ -1,2 +1,7 @@
 ==Octave Daemon==
-This will be a network daemon for [http://www.gnu.org/software/octave/ Octave], written in PHP.
+This is a network daemon for [http://www.gnu.org/software/octave/ Octave], written in PHP.
+
+===Current status===
+The code is working, the installer is installing, but nothing has been
+thoroughly tested in production, and there are a few methods that still
+need to be implemented for easy data manipulation.
