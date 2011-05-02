@@ -8,7 +8,7 @@
 
 # The PID file. There is no default value.
 # Required when started with -d, optional otherwise.
-pid_file = /var/run/octave_daemon.pid
+pid_file = /var/run/octave-daemon.pid
 
 # The home directory for Octave instances.
 # By default, the current directory is used.
@@ -17,7 +17,7 @@ home_directory = /tmp
 # The user and group the daemon should run as.
 # There is no default value.
 # Only required when started as root. Probably not a good idea otherwise.
-#run_as = nobody.nobody
+run_as = nobody.nobody
 
 # Server section (multiple server sections allowed, at least one required)
 [server]
