@@ -117,11 +117,21 @@ class Octave_daemon
 		return true;
 	}
 
+	public function kill()
+	{
+		foreach(self::$servers as $server)
+			$server->__destruct();
+
+		Octave_pool::killAll();
+
+		exit;
+	}
+
 	public function run()
 	{
 		declare(ticks = 1); 
 		pcntl_signal(SIGCHLD, array('Octave_pool','deadChild'));
-		pcntl_signal(SIGTERM, array('Octave_pool','killAll'));
+		pcntl_signal(SIGTERM, array('Octave_daemon','kill'));
 
 		while(true) {
 			foreach(self::$servers as $server) {

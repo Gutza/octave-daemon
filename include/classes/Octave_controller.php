@@ -208,8 +208,7 @@ class Octave_controller extends Octave_partial_processor
 	*/
 	public function __destruct()
 	{
-		$stat=proc_get_status($this->process);
-		if (!$stat['running'])
+		if (!is_resource($this->process))
 			// Already dead
 			return;
 

@@ -60,6 +60,9 @@ class Octave_client_socket implements iOctave_protocol
 
 	public function killSocket()
 	{
+		if (!is_resource($this->socket))
+			// Already closed
+			return;
 		socket_shutdown($this->socket); // fugly: if the client dies while waiting for a connection, we just go through the usual hoops
 		$this->close();
 	}

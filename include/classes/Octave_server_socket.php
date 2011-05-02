@@ -82,7 +82,7 @@ class Octave_server_socket
 
 	public function __destruct()
 	{
-		if (!$this->initialized)
+		if (!$this->initialized || !is_resource($this->socket))
 			return;
 
 		socket_close($this->socket);

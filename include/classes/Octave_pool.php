@@ -88,11 +88,10 @@ class Octave_pool
 		}
 	}
 
-	public function killAll($sig)
+	public function killAll()
 	{
 		foreach(self::$pool as $kid)
 			$kid->kill();
-		exit;
 	}
 
 	public function newConnection($socket)
