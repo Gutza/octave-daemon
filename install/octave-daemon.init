@@ -1,0 +1,84 @@
+#!/bin/bash
+#
+# Init file for octave-daemon
+#
+# Written by Bogdan Stancescu <bogdan@moongate.ro>
+#
+# chkconfig: - 80 10
+# description: A PHP daemon for GNU Octave
+#
+# processname: octave-daemon
+# config: /etc/sysconfig/octave-daemon
+# config: /etc/octave-daemon.conf
+
+source /etc/rc.d/init.d/functions
+
+### Default variables
+CONFIG="/etc/octave-daemon.conf"
+SYSCONFIG="/etc/sysconfig/octave-daemon"
+
+### Read configuration
+[ -r "$SYSCONFIG" ] && source "$SYSCONFIG"
+
+RETVAL=0
+prog="octave-daemon"
+desc="GNU Octave daemon"
+
+start() {
+	echo -n $"Starting $desc ($prog): "
+	daemon $prog -d -c $CONFIG
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
+	return $RETVAL
+}
+
+stop() {
+	echo -n $"Shutting down $desc ($prog): "
+	killproc $prog
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$prog
+	return $RETVAL
+}
+
+restart() {
+	stop
+	start
+}
+
+#reload() {
+#	echo -n $"Reloading $desc ($prog): "
+#	killproc $prog -HUP
+#	RETVAL=$?
+#	echo
+#	return $RETVAL
+#}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart)
+	restart
+	;;
+  condrestart)
+	[ -e /var/lock/subsys/$prog ] && restart
+	RETVAL=$?
+	;;
+#  reload)
+#	reload
+#	;;
+  status)
+	status $prog
+	RETVAL=$?
+	;;
+   *)
+	echo $"Usage: $0 {start|stop|restart|condrestart|status}"
+	RETVAL=1
+esac
+
+exit $RETVAL

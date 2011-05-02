@@ -129,6 +129,49 @@ chmod($target,0755);
 
 echo "Octave daemon now available in ".$target."\n";
 
+// Copy configuration file, if needed/desired
+$copy=true;
+if (file_exists("/etc/octave-daemon.conf")) {
+	if (!exec("diff -q octave-daemon.conf.sample /etc/octave-daemon.conf"))
+		$copy=false;
+	else {
+		echo "File /etc/octave-daemon.conf already exists, and it has changes.\n";
+		echo "Here are the diffences between the existing file and the default:\n";
+		passthru("diff /etc/octave-daemon.conf octave-daemon.conf.sample");
+		$answer=getCLI("Overwrite? [y/N] ");
+		$copy=("Y"==strtoupper(trim($answer)));
+	}
+}
+
+if ($copy && !copy("octave-daemon.conf.sample","/etc/octave-daemon.conf"))
+	exit(7);
+
+// Install init script
+if (!is_dir("/etc/init.d")) {
+	echo "This install script is trying to install /etc/init.d/octave-daemon,\n";
+	echo "but directory /etc/init.d doesn't exist on this system.\n";
+	exit (8);
+}
+
+$copy=true;
+if (file_exists("/etc/init.d/octave-daemon")) {
+	if (!exec("diff -q /etc/init.d/octave-daemon ".dirname(__FILE__)."/octave-daemon.init"))
+		$copy=false;
+	else {
+		echo "File /etc/init.d/octave-daemon already exists, and it has changes.\n";
+		echo "Here are the differences between the existing file and the default:\n";
+		passthru("diff /etc/init.d/octave-daemon octave-daemon.init");
+		$answer=getCLI("Overwrite? [y/N] ");
+		$copy=("Y"==strtoupper(trim($answer)));
+	}
+}
+if ($copy && !copy(dirname(__FILE__)."/octave-daemon.init","/etc/init.d/octave-daemon"))
+	exit(9);
+chmod("/etc/init.d/octave-daemon",0755);
+
+// All is well
+echo "Installation successful. You can start the daemon with `service octave-daemon start`\n";
+
 function getCLI($prompt)
 {
 	echo $prompt;
