@@ -25,16 +25,19 @@ class Octave_daemon
 			dirname(dirname(dirname(__FILE__))).
 			"/octave-daemon.conf";
 
+		if (!self::lock())
+			return false;
+
 		if (!self::processOptions())
 			return false;
 
 		if (!self::startServers())
 			return false;
 
-		if (!self::changeIdentity())
+		if (self::$daemonize && !self::daemonize())
 			return false;
 
-		if (self::$daemonize && !self::daemonize())
+		if (!self::changeIdentity())
 			return false;
 
 		return true;
@@ -85,11 +88,6 @@ class Octave_daemon
 			}
 		}
 
-		if (!self::lock()) {
-			self::$lastError="Another process has already locked this configuration file.";
-			return false;
-		}
-
 		self::$config=new Octave_configuration(self::$config_file);
 		if (self::$config->lastError) {
 			self::$lastError="Configuration error: ".self::$config->lastError;
@@ -103,10 +101,11 @@ class Octave_daemon
 	private function lock()
 	{
 		self::$lockptr=fopen(self::$config_file,'r');
-		if (flock(self::$lockptr,LOCK_EX+LOCK_NB))
+		if (flock(self::$lockptr,LOCK_EX + LOCK_NB))
 			return true;
 
 		fclose(self::$lockptr);
+		self::$lastError="Another process has already locked this configuration file.";
 		return false;
 	}
 
@@ -235,6 +234,8 @@ class Octave_daemon
 
 	private function daemonize()
 	{
+		self::unlock();
+
 		$pid=pcntl_fork();
 		if ($pid==-1) {
 			self::$lastError="Failed forking! You have to compile PHP with --enable-pcntl and run this on Unix-like platforms.";
@@ -244,6 +245,9 @@ class Octave_daemon
 		if ($pid)
 			// Parent
 			exit;
+
+		if (!self::lock())
+			return false;
 
 		return true;
 	}
