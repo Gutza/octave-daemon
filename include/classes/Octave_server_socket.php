@@ -60,6 +60,13 @@ class Octave_server_socket
 			return false;
 		}
 
+		if (!socket_set_option($this->socket, SOL_SOCKET, SO_REUSEADDR, 1)) {
+			$this->setError($this->getSocketError(
+				"Failed setting SO_REUSEADDR on socket"
+			),LOG_ERR);
+			return false;
+		}
+
 		if (!@socket_bind($this->socket,$this->server_address,$this->server_port)) {
 			$this->setError($this->getSocketError(
 				"Failed binding socket to ".
