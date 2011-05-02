@@ -21,14 +21,12 @@ class Octave_daemon
 
 	public function init()
 	{
-		self::$config_file=
-			dirname(dirname(dirname(__FILE__))).
-			"/octave-daemon.conf";
-
-		if (!self::lock())
-			return false;
+		self::$config_file="/etc/octave-daemon.conf";
 
 		if (!self::processOptions())
+			return false;
+
+		if (!self::lock())
 			return false;
 
 		if (!self::startServers())
