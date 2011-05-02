@@ -79,9 +79,8 @@ class Octave_pool
 		}
 	}
 
-	public function deadChild($sig)
+	public function deadChild($pid)
 	{
-		$pid=pcntl_waitpid(-1,$status);
 		foreach(self::$pool as $kid) {
 			if ($kid->processFuneral($pid))
 				break;
@@ -110,10 +109,12 @@ class Octave_pool
 					exit;
 				} elseif ($pid) {
 					// Parent
+					Octave_daemon::$child_pids[$pid]=true;
 					$kid->pid=$pid;
 					$kid->close();
 				} else {
 					// Child
+					Octave_daemon::childMode();
 					chdir(self::$home_directory);
 					$kid->entertain();
 					$kid->killSocket();

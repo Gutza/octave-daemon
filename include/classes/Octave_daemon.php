@@ -4,6 +4,8 @@ class Octave_daemon
 	implements iOctave_network
 {
 	public static $lastError="";
+	public static $child_pids=array();
+	public static $child_process=false;
 
 	private static $currentInstance;
 	private static $serverPool=array();
@@ -117,20 +119,56 @@ class Octave_daemon
 		return true;
 	}
 
-	public function kill()
+	public function closeServerSockets()
 	{
 		foreach(self::$servers as $server)
 			$server->__destruct();
+	}
 
+	public function childMode()
+	{
+		self::$child_process=true;
+		self::$child_pids=array();
+		self::closeServerSockets();
+	}
+
+	public function kill()
+	{
 		Octave_pool::killAll();
 
+		if (self::$child_process)
+			exit;
+
+		while(self::$child_pids) {
+			// Waiting for all the children to die
+			while(-1!=($pid=pcntl_waitpid(-1,$status)))
+				self::manageDeadPID($pid);
+
+			if (self::$child_pids)
+				usleep(100);
+		}
+
+		self::closeServerSockets();
+
 		exit;
+	}
+
+	public function deadChild()
+	{
+		$pid=pcntl_waitpid(-1,$status);
+		self::manageDeadPID($pid);
+	}
+
+	private function manageDeadPID($pid)
+	{
+		unset(self::$child_pids[$pid]);
+		Octave_pool::deadChild($pid);
 	}
 
 	public function run()
 	{
 		declare(ticks = 1); 
-		pcntl_signal(SIGCHLD, array('Octave_pool','deadChild'));
+		pcntl_signal(SIGCHLD, array('Octave_daemon','deadChild'));
 		pcntl_signal(SIGTERM, array('Octave_daemon','kill'));
 
 		while(true) {

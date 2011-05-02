@@ -260,6 +260,9 @@ class Octave_controller extends Octave_partial_processor
 		if (!is_resource($this->process))
 			throw new RuntimeException("Failed starting the Octave process.");
 
+		$status=proc_get_status($this->process);
+		Octave_daemon::$child_pids[$status['pid']]=true;
+
 		list($this->stdin,$this->stdout,$this->stderr)=$pipes;
 
 		// Waiting for some output on either stdin or stderr
