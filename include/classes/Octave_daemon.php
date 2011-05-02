@@ -34,7 +34,10 @@ class Octave_daemon
 		if (!self::startServers())
 			return false;
 
-		if (self::$daemonize && !self::daemonize())
+		if (!self::daemonize())
+			return false;
+
+		if (!self::writePID())
 			return false;
 
 		if (!self::changeIdentity())
@@ -234,6 +237,9 @@ class Octave_daemon
 
 	private function daemonize()
 	{
+		if (!self::$daemonize)
+			return true;
+
 		self::unlock();
 
 		$pid=pcntl_fork();
@@ -248,6 +254,25 @@ class Octave_daemon
 
 		if (!self::lock())
 			return false;
+
+		return true;
+	}
+
+	private function writePID()
+	{
+		if (!isset(self::$config->globals["pid_file"]) || !self::$config->globals["pid_file"])
+			return true;
+
+		$fp=@fopen(self::$config->globals["pid_file"],'w');
+		if (!$fp) {
+			self::$lastError="Failed opening PID file for writing.";
+			return false;
+		}
+
+		if (!@fputs($fp,getmypid()."\n")) {
+			self::$lastError="Failed saving PID in PID file.";
+			return false;
+		}
 
 		return true;
 	}
