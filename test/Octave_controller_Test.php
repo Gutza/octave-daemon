@@ -4,16 +4,12 @@ require_once "common_phpunit_test.php";
 
 class controllerTest extends commonTests
 {
-	static $octave=NULL;
-
+	public static $octave=NULL;
 	var $partialContent="";
 	var $partialCount=0;
 
 	function __construct()
 	{
-		if (!parent::__construct())
-			return;
-
 		self::$octave=new Octave_controller();
 		self::$octave->hangingProcess=true;
 		self::$octave->init();
@@ -31,17 +27,6 @@ class controllerTest extends commonTests
 		$c->init();
 	}
 
-	/**
-	* Required by PHPUnit to be explicitly defined here
-	*/
-	public function testInitialize()
-	{
-		return parent::testInitialize();
-	}
-
-	/**
-	* @depends testInitialize
-	*/
 	public function testPartialReturn()
 	{
 		$size=1000; // Again, matrix size = $size * $size
@@ -64,9 +49,6 @@ class controllerTest extends commonTests
 		self::$octave->allowPartial=false;
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testPartialProcess()
 	{
 		$size=1000; // Again, matrix size = $size * $size

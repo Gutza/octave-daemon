@@ -2,90 +2,102 @@
 
 require dirname(dirname(__FILE__))."/include/Octave_lib.php";
 
-class commonTests extends PHPUnit_Framework_TestCase
+abstract class commonTests extends PHPUnit_Framework_TestCase
 {
 
+//	public static $octave;
+/*
 	function init()
 	{
 		$r=new ReflectionClass($this);
 		return $r->getStaticPropertyValue("octave")===NULL;
 	}
+*/
 
-	public function testInitialize()
+	public function init()
 	{
 		$r=new ReflectionClass($this);
-		$myOctave=$r->getStaticPropertyValue("octave");
-var_dump($myOctave);
-		$this->assertContains($myOctave->init(),array(NULL,true));
+		$o=$r->getStaticPropertyValue("octave");
+		if ($o->init()===false)
+			return false;
+
+		return $o;
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testRunReadArithmetic()
 	{
-		$result=self::$octave->runRead("disp(5+5)");
+		if (!($octave=$this->init())) {
+			self::markTestSkipped();
+			return;
+		}
+		$result=$octave->runRead("disp(5+5)");
 		$this->assertEquals("10",rtrim($result));
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testRunReadWarning()
 	{
-		self::$octave->quiet=true;
-		$this->assertEquals("inf",rtrim(self::$octave->runRead("disp(1/0)")));
-		self::$octave->quiet=false;
-		$this->assertEquals("warning: division by zero",trim(self::$octave->lastError));
+		if (!($octave=$this->init())) {
+			self::markTestSkipped();
+			return;
+		}
+		$octave->quiet=true;
+		$this->assertEquals("inf",rtrim($octave->runRead("disp(1/0)")));
+		$octave->quiet=false;
+		$this->assertEquals("warning: division by zero",trim($octave->lastError));
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testRunReadError()
 	{
-		self::$octave->quiet=true;
-		$this->assertEmpty(self::$octave->runRead("qwerty"));
-		self::$octave->quiet=false;
-		$this->assertStringStartsWith("error: `qwerty' undefined near line ",self::$octave->lastError);
+		if (!($octave=$this->init())) {
+			self::markTestSkipped();
+			return;
+		}
+		$octave->quiet=true;
+		$this->assertEmpty($octave->runRead("qwerty"));
+		$octave->quiet=false;
+		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$octave->lastError);
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testQueryArithmetic()
 	{
-		$this->assertEquals("10",rtrim(self::$octave->query("5+5")));
+		if (!($octave=$this->init())) {
+			self::markTestSkipped();
+			return;
+		}
+		$this->assertEquals("10",rtrim($octave->query("5+5")));
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testQueryWarning()
 	{
-		self::$octave->quiet=true;
-		$this->assertEquals("inf",rtrim(self::$octave->query("1/0")));
-		self::$octave->quiet=false;
-		$this->assertEquals("warning: division by zero",trim(self::$octave->lastError));
+		if (!($octave=$this->init())) {
+			self::markTestSkipped();
+			return;
+		}
+		$octave->quiet=true;
+		$this->assertEquals("inf",rtrim($octave->query("1/0")));
+		$octave->quiet=false;
+		$this->assertEquals("warning: division by zero",trim($octave->lastError));
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testQueryError()
 	{
-		self::$octave->quiet=true;
-		$this->assertEmpty(self::$octave->query("qwerty"));
-		self::$octave->quiet=false;
-		$this->assertStringStartsWith("error: `qwerty' undefined near line ",self::$octave->lastError);
+		if (!($octave=$this->init())) {
+			self::markTestSkipped();
+			return;
+		}
+		$octave->quiet=true;
+		$this->assertEmpty($octave->query("qwerty"));
+		$octave->quiet=false;
+		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$octave->lastError);
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testSlow()
 	{
-		self::$octave->run("
+		if (!($octave=$this->init())) {
+			self::markTestSkipped();
+			return;
+		}
+		$octave->run("
 			function answer = lg_factorial6(n)
 				answer = 1;
     
@@ -100,17 +112,18 @@ var_dump($myOctave);
 		");
 
 		// This is not a proper query, since it doesn't provide a regular answer
-		$tictoc=self::$octave->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");
+		$tictoc=$octave->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");
 
 		$this->assertStringStartsWith("Elapsed time is",$tictoc);
-		$this->assertEmpty(self::$octave->lastError);
+		$this->assertEmpty($octave->lastError);
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testLargeReadWrite()
 	{
+		if (!($octave=$this->init())) {
+			self::markTestSkipped();
+			return;
+		}
 		$size=1000; // Mind you, this is $size * $size cells (1M cells, ~2M bytes for this setup)
 
 		$query="[".
@@ -125,7 +138,7 @@ var_dump($myOctave);
 				0,-1
 			)."]";
 
-		$result=trim(self::$octave->query($query));
+		$result=trim($octave->query($query));
 		$this->assertTrue((bool)$result);
 
 		$lines=explode("\n",$result);
@@ -134,26 +147,27 @@ var_dump($myOctave);
 		$this->assertEquals($size,count(explode(" ",trim($lines[$size-1]))));
 	}
 
-	/**
-	* @depends testInitialize
-	*/
 	public function testSequential()
 	{
-		self::$octave->quiet=true;
+		if (!($octave=$this->init())) {
+			self::markTestSkipped();
+			return;
+		}
+		$octave->quiet=true;
 
-		self::$octave->run("A=eye(3)");
-		self::$octave->run("B=eye(4)");
-		self::$octave->run("A*B");
-		$this->assertStringStartsWith("error: operator *: nonconformant arguments",self::$octave->lastError);
+		$octave->run("A=eye(3)");
+		$octave->run("B=eye(4)");
+		$octave->run("A*B");
+		$this->assertStringStartsWith("error: operator *: nonconformant arguments",$octave->lastError);
 
-		$this->assertEquals("2",rtrim(self::$octave->query("1+1")));
-		$this->assertEmpty(self::$octave->lastError);
+		$this->assertEquals("2",rtrim($octave->query("1+1")));
+		$this->assertEmpty($octave->lastError);
 
-		$this->assertEquals("inf",rtrim(self::$octave->query("1/0")));
-		$this->assertEquals("warning: division by zero",trim(self::$octave->lastError));
+		$this->assertEquals("inf",rtrim($octave->query("1/0")));
+		$this->assertEquals("warning: division by zero",trim($octave->lastError));
 
-		$this->assertEquals("3",rtrim(self::$octave->query("10-7")));
-		$this->assertEmpty(self::$octave->lastError);
+		$this->assertEquals("3",rtrim($octave->query("10-7")));
+		$this->assertEmpty($octave->lastError);
 	}
 
 }

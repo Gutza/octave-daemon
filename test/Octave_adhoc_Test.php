@@ -8,9 +8,6 @@ class adhocTest extends commonTests
 
 	function __construct()
 	{
-		if (!$this->init())
-			return;
-
 		self::$octave=new Octave(false);
 	}
 }

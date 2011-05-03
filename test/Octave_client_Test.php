@@ -4,13 +4,10 @@ require_once "common_phpunit_test.php";
 
 class clientTest extends commonTests
 {
-	static $octave=NULL;
+	public static $octave=NULL;
 
 	function __construct()
 	{
-		if (!parent::__construct())
-			return;
-
 		self::$octave=new Octave("localhost");
 	}
 }
