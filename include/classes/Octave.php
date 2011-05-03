@@ -42,7 +42,7 @@ class Octave
 	public $quiet=false;
 
 	protected $connector=NULL;
-	protected $connectorMethods=array();
+	protected $connectorMethods=array('run','runRead','query');
 
 	protected $initialized=false;
 
@@ -90,5 +90,23 @@ class Octave
 		$result=$this->connector->$method($payload[0]);
 		$this->lastError=$this->connector->lastError;
 		return $result;
+	}
+
+	public function getMatrix($query)
+	{
+		$raw=$this->query($query);
+		if (!strlen(trim($raw)))
+			return array();
+
+		$matrix=array();
+		$lines=explode("\n",$raw);
+		foreach($lines as $line) {
+			$line=trim($line);
+			if (!strlen($line))
+				continue;
+			$matrix[]=explode(" ",trim($line));
+		}
+
+		return $matrix;
 	}
 }
