@@ -5,15 +5,6 @@ require dirname(dirname(__FILE__))."/include/Octave_lib.php";
 abstract class commonTests extends PHPUnit_Framework_TestCase
 {
 
-//	public static $octave;
-/*
-	function init()
-	{
-		$r=new ReflectionClass($this);
-		return $r->getStaticPropertyValue("octave")===NULL;
-	}
-*/
-
 	public function init()
 	{
 		$r=new ReflectionClass($this);
