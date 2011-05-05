@@ -8,6 +8,9 @@ class clientTest extends commonTests
 
 	function __construct()
 	{
+		if (isset(self::$octave))
+			return;
+
 		self::$octave=new Octave("localhost");
 	}
 }
