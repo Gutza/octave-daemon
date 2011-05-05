@@ -387,10 +387,30 @@ class Octave_controller extends Octave_partial_processor
 	*/
 	public function more()
 	{
+		if (!$this->partialResult) {
+			$this->lastError="more() called, but no partial result was in progress";
+			return false;
+		}
 		$payload=$this->_read();
 		$this->_processErrors($payload);
 
 		return $payload['stdout'];
+	}
+
+	/**
+	* Retrieves all output remaning in a partial call.
+	*
+	* This is like an uninterrupted sequence of calls to {@link more()}
+	*
+	* @return string the same kind of result as {@link more()}
+	*/
+	public function everything()
+	{
+		$payload="";
+		while($this->partialResult)
+			$payload.=$this->more();
+
+		return $payload;
 	}
 
 	/**
