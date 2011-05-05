@@ -36,6 +36,7 @@ class Octave_client_socket implements iOctave_protocol
 {
 	public $pid=0;
 	public $socketLimit=1048576;
+	public $remoteIP;
 
 	private $socket=NULL;
 	private $controller=NULL;
@@ -50,6 +51,7 @@ class Octave_client_socket implements iOctave_protocol
 
 	public function initSocket($socket)
 	{
+		socket_getpeername($socket,$this->remoteIP);
 		socket_set_nonblock($socket);
 		$this->socket=$socket;
 	}
@@ -126,6 +128,8 @@ class Octave_client_socket implements iOctave_protocol
 
 	public function entertain()
 	{
+		Octave_logger::log("Connection accepted from ".$this->remoteIP);
+
 		$this->write(self::error_start);
 		while(true) {
 			$input=$this->read();
@@ -145,6 +149,7 @@ class Octave_client_socket implements iOctave_protocol
 			if (!$this->processCommand($command,$payload))
 				break;
 		}
+		Octave_logger::log("Closed connection from ".$this->remoteIP);
 	}
 
 	public function sendError($message)
