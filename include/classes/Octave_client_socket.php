@@ -76,7 +76,6 @@ class Octave_client_socket implements iOctave_protocol
 		$this->controller->hangingProcess=false;
 		$this->controller->__destruct();
 		$this->killSocket();
-		exit;
 	}
 
 	public function close()
