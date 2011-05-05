@@ -257,8 +257,10 @@ class Octave_controller extends Octave_partial_processor
 			$this->cwd
 		);
 
-		if (!is_resource($this->process))
-			throw new RuntimeException("Failed starting the Octave process.");
+		if (!is_resource($this->process)) {
+			$this->lastError="Failed starting the Octave process.";
+			return false;
+		}
 
 		$status=proc_get_status($this->process);
 		Octave_daemon::$child_pids[$status['pid']]=true;
@@ -270,12 +272,17 @@ class Octave_controller extends Octave_partial_processor
 		$write=NULL;
 		$except=NULL;
 
-		if (!stream_select($read, $write, $except, 5))
-			throw new RuntimeException("The process timed out on all pipes -- this should never happen, please report this problem!");
+		if (!stream_select($read, $write, $except, 5)) {
+			$this->lastError="The process timed out on all pipes -- this should never happen, please report this problem!";
+			proc_close($this->process);
+			return false;
+		}
 
 		// Any output on stderr on startup is bad news; quit just to make sure
-		if ($read[0]==$this->stderr)
-			throw new RuntimeException("Failed starting the Octave process: ".trim(stream_get_contents($this->stderr)));
+		if ($read[0]==$this->stderr) {
+			$this->lastError="Failed starting the Octave process: ".trim(stream_get_contents($this->stderr));
+			return false;
+		}
 
 		// All is well -- set options and read welcome message (no need for partial reading here)
 		$p=$this->allowPartial;
@@ -283,8 +290,10 @@ class Octave_controller extends Octave_partial_processor
 		$welcome=$this->runRead('PS1("'.$this->octave_cursor.'"); format none;'."\n");
 		$this->allowPartial=$p;
 
-		if (!preg_match("/version ([0-9.]+)$/m",$welcome,$matches))
-			throw new RuntimeException("Unrecognized welcome message from Octave:\n{\n".$welcome."}");
+		if (!preg_match("/version ([0-9.]+)$/m",$welcome,$matches)) {
+			$this->lastError="Unrecognized welcome message from Octave:\n{\n".$welcome."}";
+			return false;
+		}
 
 		$this->octave_version=$matches[1];
 		$this->initialized=true;
