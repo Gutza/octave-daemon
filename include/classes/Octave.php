@@ -70,8 +70,10 @@ class Octave
 
 		if (!$this->connector instanceof iOctave_connector)
 			throw new RuntimeException("The connector must implement iOctave_connector!");
-		if (!$this->connector->init())
+		if (!$this->connector->init()) {
+			$this->lastError=$this->connector->lastError;
 			return false;
+		}
 
 		$this->connectorMethods=get_class_methods("iOctave_connector");
 
