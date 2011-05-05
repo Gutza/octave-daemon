@@ -9,8 +9,10 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 	{
 		$r=new ReflectionClass($this);
 		$o=$r->getStaticPropertyValue("octave");
-		if ($o->init()===false)
+		if ($o->init()===false) {
+			$this->assertEquals("",$o->lastError);
 			return false;
+		}
 
 		return $o;
 	}
