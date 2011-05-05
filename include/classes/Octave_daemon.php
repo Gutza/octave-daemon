@@ -52,7 +52,6 @@ class Octave_daemon
 
 	public function init()
 	{
-		Octave_logger::log("octave-daemon starting",LOG_NOTICE);
 		self::$config_file="/etc/octave-daemon.conf";
 
 		if (!self::processOptions())
@@ -78,6 +77,7 @@ class Octave_daemon
 			return false;
 		}
 
+		Octave_logger::log("Service started",LOG_NOTICE);
 		return true;
 	}
 
@@ -96,6 +96,7 @@ class Octave_daemon
 				self::$lastError=$s->lastError;
 				return false;
 			}
+			Octave_logger::log("New server listening on ".$server['server_address'].":".$server['server_port'],LOG_NOTICE);
 			self::$servers[]=$s;
 		}
 		return true;
@@ -184,7 +185,7 @@ class Octave_daemon
 				usleep(100);
 		}
 		self::closeServerSockets();
-		Octave_logger::log("octave-daemon stopped");
+		Octave_logger::log("Service stopped");
 		exit;
 	}
 
