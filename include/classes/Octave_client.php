@@ -95,6 +95,9 @@ class Octave_client extends Octave_partial_processor
 
 	protected function _call($method,$payload)
 	{
+		if ($this->init()===false)
+			return false;
+
 		return $this->_process($method,$payload);
 	}
 
@@ -131,7 +134,7 @@ class Octave_client extends Octave_partial_processor
 	{
 		$left=$payload;
 		while(strlen($left)) {
-			$result=socket_write($this->socket,$left);
+			$result=@socket_write($this->socket,$left);
 			if ($result===false) {
 				$this->lastError="The server has disconnected.";
 				return false;
@@ -155,7 +158,7 @@ class Octave_client extends Octave_partial_processor
 			$fixed=true;
 
 		while(true) {
-			$atom=socket_read($this->socket, $size);
+			$atom=@socket_read($this->socket, $size);
 			if ($atom===false || $atom==="") {
 				$this->lastError="The server has disconnected.";
 				return false;
