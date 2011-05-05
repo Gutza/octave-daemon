@@ -39,6 +39,10 @@ if ($me!='root') {
 	exit(1);
 }
 
+$debug=isset($argv[1]) && $argv[1]=="-d";
+if ($debug)
+	echo "Installing in debug mode.\n";
+
 // Test whether we can find the Octave binary
 if (!exec("which octave 2>/dev/null")) {
 	$answer=getCLI(
@@ -63,10 +67,14 @@ $classes=array(
 	"iOctave_connector",
 	"Octave_client_socket",
 	"iOctave_protocol",
+	"Octave_logger",
 );
 
 // Generate the temporary file
 $tmp_fname=tempnam("/tmp","octave_installer");
+if ($debug)
+	echo "Temp file: ".$tmp_fname."\n";
+
 $tmp=fopen($tmp_fname,'w');
 if (!$tmp)
 	exit(3);
@@ -95,8 +103,14 @@ foreach($classes as $class) {
 fclose($tmp);
 exec("cat ".dirname(__FILE__)."/install-suffix.php >> ".$tmp_fname);
 
+if ($debug) {
+	$lines=file($tmp_fname);
+	$code=array(
+		$lines[0],
+		implode("",array_slice($lines,1)),
+	);
 // Clean up the code
-if (!exec("php -w ".$tmp_fname,$code))
+} elseif (!exec("php -w ".$tmp_fname,$code))
 	exit(4);
 
 // Start over with the comments at the top
