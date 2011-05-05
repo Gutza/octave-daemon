@@ -121,6 +121,13 @@ class Octave_controller extends Octave_partial_processor
 	private $stderr;
 
 	/**
+	* The cureent Octave {@link $process}'s PID
+	*
+	* @var integer
+	*/
+	public $pid;
+
+	/**
 	* The Octave process
 	*
 	* @var resource
@@ -219,7 +226,11 @@ class Octave_controller extends Octave_partial_processor
 
 		$this->_send("quit\n");
 		$this->_closePipes();
-		proc_close($this->process);
+		$status=proc_close($this->process);
+		if ($status==-1)
+			throw new RuntimeException("Failed closing process");
+
+		Octave_daemon::manageDeadPID($this->pid);
 	}
 
 	/**
@@ -263,6 +274,7 @@ class Octave_controller extends Octave_partial_processor
 		}
 
 		$status=proc_get_status($this->process);
+		$this->pid=$status['pid'];
 		Octave_daemon::$child_pids[$status['pid']]=true;
 
 		list($this->stdin,$this->stdout,$this->stderr)=$pipes;
