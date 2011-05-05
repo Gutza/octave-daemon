@@ -197,7 +197,7 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 		$this->lock();
 		$octave->quiet=true;
 
-		$r1=$octave->run("A=eye(3); B=eye(4); A*B");
+		$r1=$octave->run("A=eye(3); B=eye(4);").$octave->run("A*B");
 		$err1=$octave->lastError;
 
 		$r2=$octave->query("1+1");
@@ -212,7 +212,7 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 		$octave->quiet=false;
 		$this->unlock();
 
-		$this->assertStringStartsWith("error: operator *: nonconformant arguments",$err1);
+		$this->assertStringStartsWith("error: operator *: nonconformant arguments",$err1,"Actual error:\n".$err1);
 
 		$this->assertEquals("2",rtrim($r2));
 		$this->assertEmpty($err2);
