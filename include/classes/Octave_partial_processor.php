@@ -19,7 +19,7 @@
 * along with this program.  If not, see {@link http://www.gnu.org/licenses/}.
 *
 * @package octave-daemon
-* @subpackage client
+* @subpackage common
 * @author Bogdan Stăncescu <bogdan@moongate.ro>
 * @version 1.0
 * @copyright Copyright (c) 2011, Bogdan Stăncescu
