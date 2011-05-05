@@ -47,25 +47,38 @@ class Octave_pool
 		if ($kid=self::firstChild($cSocket))
 			return $kid;
 
+		// this never happens in the current setup
 		if (count(self::$pool)<self::$maxCount)
 			return self::registerChild($cSocket);
 
 		return false;
 	}
 
-	private function registerChild($cSocket)
+	public function startControllers()
+	{
+		for($i=0;$i<self::$maxCount;$i++)
+			if (!self::registerChild())
+				return false;
+
+		return true;
+	}
+
+	private function registerChild($cSocket=NULL)
 	{
 		$controller=new Octave_controller();
 		$controller->cwd=self::$home_directory;
-		try {
-			$controller->init();
-		} catch(Exception $e) {
-			Octave_logger::log("Failed starting Octave controller: ".$e->message);
+		if (!$controller->init()) {
+			Octave_logger::log("Failed starting Octave controller: ".$controller->lastError);
 			return false;
 		}
+
 		$kid=new Octave_client_socket($controller);
-		$kid->initSocket($cSocket);
 		self::$pool[]=$kid;
+
+		if (!$cSocket)
+			return $kid;
+
+		$kid->initSocket($cSocket);
 		return $kid;
 	}
 

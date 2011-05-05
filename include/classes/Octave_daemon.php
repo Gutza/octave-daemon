@@ -198,6 +198,8 @@ class Octave_daemon
 
 	public function run()
 	{
+		Octave_pool::startControllers();
+
 		declare(ticks = 1); 
 		pcntl_signal(SIGCHLD, array('Octave_daemon','deadChild'));
 		pcntl_signal(SIGTERM, array('Octave_daemon','kill'));
