@@ -10,14 +10,14 @@ class controllerTest extends commonTests
 
 	function __construct()
 	{
+		if (isset(self::$octave))
+			return;
+
 		self::$octave=new Octave_controller();
 		self::$octave->hangingProcess=true;
 		self::$octave->init();
 	}
 
-	/**
-	* @expectedException RuntimeException
-	*/
 	public function testNoBinary()
 	{
 		$c=new Octave_controller();
@@ -25,6 +25,7 @@ class controllerTest extends commonTests
 		unlink($nonfile);
 		$c->octave_binary=$nonfile;
 		$c->init();
+		$this->assertStringStartsWith("Failed starting the Octave process",$c->lastError);
 	}
 
 	public function testPartialReturn()
