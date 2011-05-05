@@ -151,13 +151,13 @@ if (file_exists("/etc/octave-daemon.conf")) {
 	else {
 		echo "File /etc/octave-daemon.conf already exists, and it has changes.\n";
 		echo "Here are the diffences between the existing file and the default:\n";
-		passthru("diff /etc/octave-daemon.conf octave-daemon.conf.sample");
+		passthru("diff /etc/octave-daemon.conf ".dirname(dirname(__FILE__))."/octave-daemon.conf.sample");
 		$answer=getCLI("Overwrite? [y/N] ");
 		$copy=("Y"==strtoupper(trim($answer)));
 	}
 }
 
-if ($copy && !copy("octave-daemon.conf.sample","/etc/octave-daemon.conf"))
+if ($copy && !copy(dirname(dirname(__FILE__))."/octave-daemon.conf.sample","/etc/octave-daemon.conf"))
 	exit(7);
 
 // Install init script
@@ -174,7 +174,7 @@ if (file_exists("/etc/init.d/octave-daemon")) {
 	else {
 		echo "File /etc/init.d/octave-daemon already exists, and it has changes.\n";
 		echo "Here are the differences between the existing file and the default:\n";
-		passthru("diff /etc/init.d/octave-daemon octave-daemon.init");
+		passthru("diff /etc/init.d/octave-daemon ".dirname(__FILE__)."/octave-daemon.init");
 		$answer=getCLI("Overwrite? [y/N] ");
 		$copy=("Y"==strtoupper(trim($answer)));
 	}
