@@ -237,9 +237,9 @@ class Octave_controller extends Octave_partial_processor
 	* Initializes the controller.
 	*
 	* Starts the Octave process and drops the welcome message.
-	* Throws a RuntimeException if it fails to start the Octave process.
 	*
-	* @return void
+	* @return mixed true on success, false on failure or NULL if
+	* already initialized. On failure, look at {@link $lastError}.
 	*/
 	public function init()
 	{
