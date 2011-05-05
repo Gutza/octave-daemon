@@ -122,7 +122,7 @@ class Octave_server_socket
 
 		// IP filtering, if enabled
 		if (!$this->allow_ip($remote_IP)) {
-			Octave_logger::getCurrent()->log("Connection attempt from ".$remote_IP);
+			Octave_logger::log("Connection attempt from ".$remote_IP);
 			socket_close($cSocket);
 			return NULL;
 		}
