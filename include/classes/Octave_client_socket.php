@@ -97,7 +97,7 @@ class Octave_client_socket implements iOctave_protocol
 		return true;
 	}
 
-	public function write($message,$partial)
+	public function write($message,$partial=false)
 	{
 		if (!$partial)
 			$message.=self::error_end;
@@ -127,7 +127,7 @@ class Octave_client_socket implements iOctave_protocol
 
 	public function entertain()
 	{
-		$this->write(self::error_start,false);
+		$this->write(self::error_start);
 		while(true) {
 			$input=$this->read();
 
@@ -195,7 +195,7 @@ class Octave_client_socket implements iOctave_protocol
 
 			// This is partial, because the errors always follow
 			if (!$this->write($response['response'],true))
-				return false;
+				return $this->controller->everything() && false;
 
 			if (!$partial)
 				return $this->write(self::error_start.$response['error'],$partial);
