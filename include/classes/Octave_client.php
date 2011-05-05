@@ -40,6 +40,7 @@ class Octave_client extends Octave_partial_processor
 	public $socketLimit=1048576;
 
 	private $socket;
+	protected $initialized=false;
 
 	public function __construct($host=NULL,$port=NULL)
 	{
@@ -52,6 +53,9 @@ class Octave_client extends Octave_partial_processor
 
 	public function init()
 	{
+		if ($this->initialized)
+			return NULL;
+
 		$this->socket=@socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if ($this->socket===false) {
 			$this->lastError=$this->getSocketError("Failed creating client socket");
@@ -67,7 +71,7 @@ class Octave_client extends Octave_partial_processor
 
 		$this->_read();
 
-		return true;
+		return $this->initialized=true;
 	}
 
 	protected function getSocketError($msg)
