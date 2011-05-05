@@ -52,6 +52,7 @@ class Octave_daemon
 
 	public function init()
 	{
+		Octave_logger::log("octave-daemon starting",LOG_NOTICE);
 		self::$config_file="/etc/octave-daemon.conf";
 
 		if (!self::processOptions())
@@ -71,6 +72,11 @@ class Octave_daemon
 
 		if (!self::changeIdentity())
 			return false;
+
+		if (!Octave_pool::startControllers()) {
+			self::$lastError=Octave_pool::$lastError;
+			return false;
+		}
 
 		return true;
 	}
@@ -166,7 +172,6 @@ class Octave_daemon
 	public function kill()
 	{
 		Octave_pool::killAll();
-
 		if (self::$child_process)
 			exit;
 
@@ -178,9 +183,8 @@ class Octave_daemon
 			if (self::$child_pids)
 				usleep(100);
 		}
-
 		self::closeServerSockets();
-
+		Octave_logger::log("octave-daemon stopped");
 		exit;
 	}
 
@@ -190,7 +194,7 @@ class Octave_daemon
 		self::manageDeadPID($pid);
 	}
 
-	private function manageDeadPID($pid)
+	public function manageDeadPID($pid)
 	{
 		unset(self::$child_pids[$pid]);
 		Octave_pool::deadChild($pid);
@@ -198,8 +202,6 @@ class Octave_daemon
 
 	public function run()
 	{
-		Octave_pool::startControllers();
-
 		declare(ticks = 1); 
 		pcntl_signal(SIGCHLD, array('Octave_daemon','deadChild'));
 		pcntl_signal(SIGTERM, array('Octave_daemon','kill'));
