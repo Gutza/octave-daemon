@@ -68,7 +68,7 @@ class Octave_pool
 		$controller=new Octave_controller();
 		$controller->cwd=self::$home_directory;
 		if (!$controller->init()) {
-			Octave_logger::log("Failed starting Octave controller: ".$controller->lastError);
+			Octave_logger::log("Failed starting Octave controller: ".$controller->lastError,LOG_ERR);
 			return false;
 		}
 
@@ -94,10 +94,9 @@ class Octave_pool
 
 	public function deadChild($pid)
 	{
-		foreach(self::$pool as $kid) {
+		foreach(self::$pool as $kid)
 			if ($kid->processFuneral($pid))
 				break;
-		}
 	}
 
 	public function killAll()
