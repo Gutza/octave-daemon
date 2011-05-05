@@ -121,8 +121,7 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 			self::markTestSkipped();
 			return;
 		}
-		$this->lock();
-		$octave->run(str_replace("\n","","
+		$funcdef=str_replace("\t"," ",str_replace("\n","","
 			function answer = lg_factorial6(n)
 				answer = 1;
     
@@ -135,17 +134,22 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 				endif
 			endfunction
 		"));
+
+		$this->lock();
+		$r1=$octave->run($funcdef);
 		$err1=$octave->lastError;
 
-		$r2=$octave->runRead("who");
+		$r2=$octave->runRead("who -functions");
 
 		// This is not a proper query, since it doesn't provide a regular answer
 		$r3=$octave->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");
 		$err3=$octave->lastError;
 		$this->unlock();
 
+		$this->assertTrue((bool) $r1,"Failed defining function ($r1):\n".$funcdef."\n");
 		$this->assertEquals("",$err1);
-		$this->assertRegExp("/lg_factorial6/",$r2);
+
+		$this->assertRegExp("/lg_factorial6/",$r2,"Function lg_factorial6 not defined: ".$r2);
 
 		$this->assertEquals("",$err3);
 		$this->assertStringStartsWith("Elapsed time is",$r3);
