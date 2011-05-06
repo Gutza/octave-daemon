@@ -456,6 +456,9 @@ class Octave_controller extends Octave_partial_processor
 	{
 		$command=trim($command);
 
+		if ($withOutput===NULL)
+			return $command."\n";
+
 		while(substr($command,-1)==';')
 			$command=substr($command,0,-1);
 
@@ -474,7 +477,12 @@ class Octave_controller extends Octave_partial_processor
 	public function run($command)
 	{
 		$success=$this->_send($this->_prepareCommand($command));
+
+		$pp=$this->partialProcessing;
+		$this->partialProcessing=false;
 		$this->_retrieve();
+		$this->partialProcessing=$pp;
+
 		return $success;
 	}
 
@@ -486,7 +494,7 @@ class Octave_controller extends Octave_partial_processor
 	*/
 	public function runRead($command)
 	{
-		if (!$this->_send($this->_prepareCommand($command,true)))
+		if (!$this->_send($this->_prepareCommand($command,NULL)))
 			return false;
 
 		return $this->_retrieve();
@@ -500,7 +508,7 @@ class Octave_controller extends Octave_partial_processor
 	*/
 	public function query($command)
 	{
-		return $this->runRead("disp(".$command.")");
+		return $this->runRead("disp(".$command.");");
 	}
 
 	public function retrieve($filename)
