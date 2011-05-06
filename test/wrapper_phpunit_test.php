@@ -12,10 +12,8 @@ abstract class wrapperTests extends commonTests
 			return;
 		}
 		$size=37;
-		$this->lock();
 		$octave->run("A=eye($size)");
 		$matrix=$octave->getMatrix('A');
-		$this->unlock();
 		$this->assertEquals($size,count($matrix));
 		$this->assertEquals($size,count($matrix[0]));
 	}

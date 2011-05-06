@@ -14,15 +14,4 @@ class clientTest extends wrapperTests
 
 		self::$octave=new Octave("localhost");
 	}
-
-	function lock()
-	{
-		$this->fp=fopen(__FILE__,'r');
-		flock($this->fp,LOCK_EX);
-	}
-
-	function unlock()
-	{
-		flock($this->fp,LOCK_UN);
-	}
 }

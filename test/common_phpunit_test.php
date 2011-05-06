@@ -17,23 +17,13 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 		return $o;
 	}
 
-	public function lock()
-	{
-	}
-
-	public function unlock()
-	{
-	}
-
 	public function testRunReadArithmetic()
 	{
 		if (!($octave=$this->init())) {
 			self::markTestSkipped();
 			return;
 		}
-		$this->lock();
 		$result=$octave->runRead("disp(5+5)");
-		$this->unlock();
 		$this->assertEquals("10",rtrim($result));
 	}
 
@@ -43,12 +33,10 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 			self::markTestSkipped();
 			return;
 		}
-		$this->lock();
 		$octave->quiet=true;
 		$result=$octave->runRead("disp(1/0)");
 		$lastError=$octave->lastError;
 		$octave->quiet=false;
-		$this->unlock();
 
 		$this->assertEquals("inf",rtrim($result));
 		$this->assertEquals("warning: division by zero",trim($lastError));
@@ -60,12 +48,10 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 			self::markTestSkipped();
 			return;
 		}
-		$this->lock();
 		$octave->quiet=true;
 		$result=$octave->runRead("qwerty");
 		$lastError=$octave->lastError;
 		$octave->quiet=false;
-		$this->unlock();
 
 		$this->assertEmpty($result);
 		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$lastError);
@@ -77,9 +63,7 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 			self::markTestSkipped();
 			return;
 		}
-		$this->lock();
 		$result=$octave->query("5+5");
-		$this->unlock();
 		$this->assertEquals("10",rtrim($result));
 	}
 
@@ -89,12 +73,10 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 			self::markTestSkipped();
 			return;
 		}
-		$this->lock();
 		$octave->quiet=true;
 		$result=$octave->query("1/0");
 		$lastError=$octave->lastError;
 		$octave->quiet=false;
-		$this->unlock();
 		$this->assertEquals("inf",rtrim($result));
 		$this->assertEquals("warning: division by zero",trim($lastError));
 	}
@@ -105,12 +87,10 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 			self::markTestSkipped();
 			return;
 		}
-		$this->lock();
 		$octave->quiet=true;
 		$result=$octave->query("qwerty");
 		$lastError=$octave->lastError;
 		$octave->quiet=false;
-		$this->unlock();
 		$this->assertEmpty($result);
 		$this->assertStringStartsWith("error: `qwerty' undefined near line ",$lastError);
 	}
@@ -135,7 +115,6 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 			endfunction
 		"));
 
-		$this->lock();
 		$r1=$octave->run($funcdef);
 		$err1=$octave->lastError;
 
@@ -144,7 +123,6 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 		// This is not a proper query, since it doesn't provide a regular answer
 		$r3=$octave->runRead("tic(); for i=1:10000 lg_factorial6( 10 ); end; toc()");
 		$err3=$octave->lastError;
-		$this->unlock();
 
 		$this->assertTrue((bool) $r1,"Failed defining function ($r1):\n".$funcdef."\n");
 		$this->assertEquals("",$err1);
@@ -175,9 +153,7 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 				0,-1
 			)."]";
 
-		$this->lock();
 		$result=trim($octave->query($query));
-		$this->unlock();
 
 		$this->assertTrue((bool)$result);
 
@@ -194,7 +170,6 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 			return;
 		}
 
-		$this->lock();
 		$octave->quiet=true;
 
 		$r1=$octave->run("A=eye(3); B=eye(4);").$octave->run("A*B");
@@ -210,7 +185,6 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 		$err4=$octave->lastError;
 
 		$octave->quiet=false;
-		$this->unlock();
 
 		$this->assertStringStartsWith("error: operator *: nonconformant arguments",$err1,"Actual error:\n".$err1);
 
