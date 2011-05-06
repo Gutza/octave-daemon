@@ -1,8 +1,8 @@
 <?php
 
-require_once "common_phpunit_test.php";
+require_once "wrapper_phpunit_test.php";
 
-class adhocTest extends commonTests
+class adhocTest extends wrapperTests
 {
 	static $octave=NULL;
 
