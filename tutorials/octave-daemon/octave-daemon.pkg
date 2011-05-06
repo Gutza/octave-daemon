@@ -26,7 +26,7 @@
 
     <para>{@link http://www.gnu.org/software/octave/ GNU Octave} is an
     extremely fast solution for large, complex numerical computations. For
-    small scale projects, running an ad hoc Octave instance for processing is
+    small scale projects, running ad hoc Octave instances for processing is
     perfectly acceptable. However, for larger projects, running new Octave
     instances for each processing operation can become inefficient.</para>
 
@@ -74,6 +74,11 @@
       </listitem>
     </itemizedlist>
 
+    <para>If you have a choice on whether to use ad hoc instances or the network
+    daemon in production, please consult the
+    {@tutorial quickstart.pkg#quickstart.qs_choose Quick Start} section to make
+    an informed decision.</para>
+
     <refsect2 id="{@id caveats}">
       <title>Caveats</title>
 
@@ -85,7 +90,7 @@
           <para>There is no security in place. There is no authentication, there are
           no disk, CPU time or memory quotas, and the {@link Octave_client::retrieve() retr}
           command can be used to retrieve any file on the server. The only security provision
-          in place is the {@link Octave_server_socket::$allowedIP basic IP filter} in
+          in place is the {@link Octave_server_socket::$allowed_ranges basic IP filter} option in
           the server; and even that is very crudely implemented, you shouldn't
           rely solely on that feature.</para>
         </listitem>
