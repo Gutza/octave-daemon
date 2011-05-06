@@ -24,17 +24,20 @@
     <title>Basic information</title>
 
     <para>The documentation is always available on the project's homepage,
-    at {@link http://projects.moongate.ro/octave-daemon/}. The source code is
-    always available on GitHub, at {@link https://github.com/Gutza/octave-daemon/}.
+    at {@link http://projects.moongate.ro/octave-daemon/}. New versions are also
+    announced {@link http://freshmeat.net/projects/octave-daemon on Freshmeat},
+    if you find it easier to follow the project that way.
     </para>
 
-    <para>In order to download the source, either use {@link http://git-scm.com/ git}
-    (git://github.com/Gutza/octave-daemon.git) or download via HTTP at
-    {@link https://github.com/Gutza/octave-daemon/downloads}. For installation
-    instructions please see file INSTALL in the package.</para>
+    <para>The live source code is always available on GitHub, at
+    {@link https://github.com/Gutza/octave-daemon/}. In order to download
+    the code, either use {@link http://git-scm.com/ git}
+    (git://github.com/Gutza/octave-daemon.git), or download via HTTP at
+    {@link https://github.com/Gutza/octave-daemon/downloads}.
+    For installation instructions please see file INSTALL in the package.</para>
 
     <refsect2 id="{@id support}">
-      <title>Support</title>
+      <title>Support, licensing</title>
 
       <para>If you want to report bugs, please use the GitHub interface
       at {@link https://github.com/Gutza/octave-daemon/issues}. For support requests,
