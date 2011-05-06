@@ -35,7 +35,7 @@
     only contains the raw networking logic for managing server sockets.</para>
 
     <para>The logic for triggering the various pool actions based on incoming
-    connections lives in file {@link server.php}.</para>
+    connections lives in {@link Octave_daemon}.</para>
   </refsection>
 </refentry>
 
