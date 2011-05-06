@@ -1,15 +1,7 @@
 <?php
 
-/**
-* A simple example for using the controller
-* @package octave-daemon
-* @subpackage server
-*/
+require "Octave_lib.php";
 
-/**
-* The octave-daemon library.
-*/
-require dirname(dirname(__FILE__))."/include/Octave_lib.php";
 $c=new Octave_controller();
 $c->init();
 
