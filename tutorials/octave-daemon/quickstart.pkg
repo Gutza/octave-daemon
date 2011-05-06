@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry id="{@id proto}">
+  <refmeta>
+    <refentrytitle></refentrytitle>
+
+    <manvolnum></manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>Quick Start</refname>
+
+    <refpurpose>An introductory tutorial to get you on your way</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command></command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 id="{@id quickstart}">
+    <title>Introduction</title>
+
+    <para>This document is meant for people writing PHP code who want
+    to use the PHP classes available in this package. If you're coding
+    in another programming language then you should install the daemon
+    and read about the {@tutorial protocol.pkg network protocol}.</para>
+
+    <para>We'll start with a bare bones example that doesn't even require
+    the daemon itself. Start by copying the content of directory include from
+    the package to your project (it doesn't matter where in your project;
+    create a new directory or use your existing structure). The examples
+    in this document assume that file {@link Octave_lib.php} is located in the
+    current directory; you will have to specify the proper path, but the
+    rest of the code should work as shown.</para>
+
+    <para>Let's start with a very simple example that only performs
+    simple arithmetic:
+
+    {@example qs1_1.php}
+
+    The wrapper instantiated at line 5 knows to use an ad hoc Octave
+    instance because we passed a boolean for its parameter (true or false
+    work both). Once you install the daemon (or deploy the code to a server
+    that can connect to the daemon) you can use the same code, and simply
+    change line 5 to tell the wrapper which server to connect to:
+
+    {@example qs1_2.php}
+
+    If for some reason you had to use a differeny port from the default,
+    you can specify that as well:
+
+    {@example qs1_3.php}
+
+    The rest of the examples on this page will use ad hoc instances,
+    because those work even if you don't start the daemon. You can change
+    the connection method for any of them as shown above, and they will
+    still work.
+    </para>
+
+    <refsect2 id="{@id qs_multiple}">
+      <title>Multiple commands</title>
+
+      <para>In the previous section we only issued one command, and queried
+      its result. Let's issue a few different commands in sequence:
+
+      {@example qs2_1.php}
+
+      Method Octave::query() passes the statement to command {@link http://www.gnu.org/software/octave/doc/interpreter/Terminal-Output.html#index-disp-797 disp} in Octave.
+      Method Octave::run() simply executes the statement(s) in Octave and ignores
+      Octave's output. There's also a third method in this family, Octave::readRun(),
+      which is similar to Octave::run(), but which actually returns Octave's output;
+      this is useful when you actually need Octave's output:
+
+      {@example qs2_2.php}
+
+      
+      </para>
+    </refsect2>
+
+    <refsect2 id="{@id qs_other}">
+      <title>Other methods</title>
+
+      <para>In the previous sections we saw core methods Octave::run(), Octave::runRead()
+      and Octave::query(). There are two other methods that you will find useful:
+      Octave::getMatrix(), which is similar to Octave::query() but returns a PHP array
+      (currently only works with one- and two-dimensional arrays), and method
+      Octave::retrieve() which retrieves files from the server.</para>
+
+      <para>Octave::getMatrix() works pretty much as you'd expect it to, except
+      that it always returns a two-dimensional array:
+
+      {@example qs3_1.php}
+
+      This method could be modified to support N-dimensional matrices, but so far
+      there was no need for that.
+      </para>
+
+      <para>Octave::retrieve() works exactly as you'd expect it to:
+
+      {@example qs3_2.php}
+
+      This method can be used to retrieve any kind of files, including binaries (images, audio files etc).
+      </para>
+
+    </refsect2>
+
+    <refsect2 id="{@id qs_choose}">
+      <title>Choosing an approach</title>
+
+      <para>Choosing the best approach between ad hoc instances and using the
+      network server is a bit tricky, because it depends on your needs.
+      Here's an example that illustrates the differences:
+
+      {@example qs_compare.php}
+
+      If you analyze the resulting data, you will notice the following:
+      
+      <itemizedlist>
+        <listitem>
+          <para>The initialization time is three orders of magnitude larger
+          for ad hoc instances than for network clients. That's caused by
+          Octave's own startup time.</para>
+        </listitem>
+        <listitem>
+          <para>Sending commands is one order of magnitude faster for
+          ad hoc instances than for network clients. That's caused primarily
+          by latency inherent to network operations; this example doesn't
+          illustrate any limitations caused by network bandwidth issues,
+          because everything happens locally.</para>
+        </listitem>
+        <listitem>
+          <para>Sending batches of commands is perfectly comparable to sending
+          single commands, and much faster than sending multiple separate commands,
+          in either approach.</para>
+        </listitem>
+        <listitem>
+          <para>Sending or receiving large quantities of data is perfectly
+          comparable in the two approaches (as long as bandwidth limitations
+          don't apply).</para>
+        </listitem>
+      </itemizedlist>
+
+      In addition to the above, you should take into consideration the fact
+      that the network approach uses persistent Octave instances,
+      which is a double-edged sword. If your project requires you
+      to process the same data set over and over, you can take advantage
+      of the daemon's persistence to avoid loading times. On the other
+      hand, if you need a lot of temporary variables with different names
+      from one session to the next then the persistence becomes your enemy,
+      because you'll end up filling up the memory with garbage.
+      </para>
+
+      <para>In conclusion, you're generally better off with the network
+      approach, unless one of the following happens:
+
+      <itemizedlist>
+        <listitem>
+          <para>You can't install the daemon, for one reason or another;</para>
+        </listitem>
+        <listitem>
+          <para>Your project requires you to have a live dialogue with Octave
+          (i.e. you need to issue a lot of distinct commands, and can't get
+          away with functions or batches of commands);</para>
+        </listitem>
+        <listitem>
+          <para>Your project requires you to pollute Octave's variable space
+          with a lot of temporary garbage (although this is generally not
+          a real issue, because you can easily clean up Octave's variable space
+          using Octave's own {@link http://www.gnu.org/software/octave/doc/interpreter/Status-of-Variables.html#index-clear-468 clear} command).</para>
+        </listitem>
+      </itemizedlist>
+      </para>
+    </refsect2>
+  </refsect1>
+</refentry>
+

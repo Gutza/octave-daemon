@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry id="{@id proto}">
+  <refmeta>
+    <refentrytitle></refentrytitle>
+
+    <manvolnum></manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>Resources</refname>
+
+    <refpurpose>Downloading and installing, documentation, other resources</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command></command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 id="{@id resources}">
+    <title>Basic information</title>
+
+    <para>The documentation is always available on the project's homepage,
+    at {@link http://projects.moongate.ro/octave-daemon/}. The source code is
+    always available on GitHub, at {@link https://github.com/Gutza/octave-daemon/}.
+    </para>
+
+    <para>In order to download the source, either use {@link http://git-scm.com/ git}
+    (git://github.com/Gutza/octave-daemon.git) or download via HTTP at
+    {@link https://github.com/Gutza/octave-daemon/downloads}. For installation
+    instructions please see file INSTALL in the package.</para>
+
+    <refsect2 id="{@id support}">
+      <title>Support</title>
+
+      <para>If you want to report bugs, please use the GitHub interface
+      at {@link https://github.com/Gutza/octave-daemon/issues}. For support requests,
+      or if you're interested in other licensing options, please contact us at
+      {@link http://www.moongate.eu/contact/}.</para>
+    </refsect2>
+  </refsect1>
+</refentry>
+
