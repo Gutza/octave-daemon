@@ -26,6 +26,8 @@
 * The basic process controller for Octave.
 *
 * It only performs the most basic tasks (it starts the process, sends commands and reads raw output).
+* Internally, this is the code that actually gets the job done. In most cases,
+* you don't need to instantiate this class directly -- use {@link Octave} instead.
 *
 * @author Bogdan Stăncescu <bogdan@moongate.ro>
 * @version 1.0
