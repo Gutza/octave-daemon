@@ -29,7 +29,8 @@
     what this project is about, and some of its known limitations. If you're
     writing code in PHP, you should continue with {@tutorial quickstart.pkg the quickstart guide},
     a frugal tutorial that explains and exemplifies the most common usage
-    scenarios. If you're writing in a different programming language, you
+    scenarios, and at least skim over the {@tutorial advanced.pkg Advanced usage} guide.
+    If you're writing in a different programming language, you
     might be interested in the {@tutorial protocol.pkg network protocol specification}.
     If you're interested in developing this project you can get a grasp of how
     things work on the server side by glancing at {@tutorial server.pkg the server structure};

@@ -23,12 +23,13 @@
   <refsect1 id="{@id partial}">
     <title>Partial output</title>
 
-    <para>Vanilla calls to Octave::query() are fine in most cases.
+    <para>Vanilla calls to Octave::query() are fine in most cases (you're expected
+    to have read the {@tutorial quickstart.pkg Quick Start tutorial}).
     However, when you need to retrieve large results (e.g. large matrices),
     the waiting time becomes significant. Ironically, that's completely
     unrelated to Octave's actual processing -- the problem is caused
     by a bottleneck in Octave's own output mechanism. Even plain output piped
-    directly from Octave to a file is quite slow, as this example demonstrates:
+    directly from Octave to a file is quite slow, as this listing demonstrates:
 
     {@example piping.txt}
 
