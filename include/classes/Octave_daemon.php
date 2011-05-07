@@ -32,7 +32,6 @@
 * @subpackage server
 */
 class Octave_daemon
-	implements iOctave_network
 {
 	public static $lastError="";
 	public static $child_pids=array();
