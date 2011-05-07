@@ -2,7 +2,9 @@
 /**
 * Octave-daemon -- a network daemon for Octave, written in PHP
 *
-* This is the main client library. It just registers the SPL autoloader.
+* This is the main client library.
+*
+* It just includes {@link Octave_constants.php} and registers the SPL autoloader.
 *
 * Copyright (C) 2011 Bogdan Stancescu <bogdan@moongate.ro>
 *
@@ -26,6 +28,11 @@
 * @copyright Copyright (c) 2011, Bogdan Stăncescu
 * @license http://www.gnu.org/licenses/agpl-3.0.html GNU Affero GPL
 */
+
+/**
+* Define the constants
+*/
+require dirname(__FILE__)."/Octave_constants.php";
 
 /**
 * The SPL autoloader.
