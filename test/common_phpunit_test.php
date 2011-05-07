@@ -155,7 +155,7 @@ abstract class commonTests extends PHPUnit_Framework_TestCase
 
 		$result=trim($octave->query($query));
 
-		$this->assertTrue((bool)$result);
+		$this->assertTrue((bool)$result,$octave->lastError);
 
 		$lines=explode("\n",$result);
 		$this->assertEquals($size,count($lines));
