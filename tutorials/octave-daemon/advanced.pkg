@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry id="{@id advanced}">
+  <refmeta>
+    <refentrytitle></refentrytitle>
+
+    <manvolnum></manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>Advanced usage</refname>
+
+    <refpurpose>A tutorial on advanced topics</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command></command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 id="{@id partial}">
+    <title>Partial output</title>
+
+    <para>Vanilla calls to Octave::query() are fine in most cases.
+    However, when you need to retrieve large results (e.g. large matrices),
+    the waiting time becomes significant. Ironically, that's completely
+    unrelated to Octave's actual processing -- the problem is caused
+    by a bottleneck in Octave's own output mechanism. Even plain output piped
+    directly from Octave to a file is quite slow, as this example demonstrates:
+
+    {@example piping.txt}
+
+    Command 1 shows the baseline time for starting Octave on this server (about one second).
+    Command 2 outputs half a million cells in delme.file (the resulting file size
+    is shown in Command 4); that adds 1.5 basicaly just for outputting the matrix
+    (the matrix is generated in virtually no time at all, as shown in Command 6).
+    The performance is appalling -- 1.9 MB in 1.5 seconds boils down to 1.27 MBps
+    (and that has nothing to do with disk performance, as shown by Command 5).
+    Command 3 shows that even dumping the output altogether we still have to wait some
+    0.6 seconds for the output to go down the drain; while that looks better, it's
+    still only 3.5 MBps for dumping stuff.
+    </para>
+
+    <para>Moving closer to home, this means that we end up with this kind of situation:
+
+    {@example adv1_1.php}
+
+    The results are identical for network processes that run locally:
+
+    {@example adv1_2.php}
+
+    Comparing the PHP approach to direct calls to Octave (as shown in the first listing),
+    we find that in PHP the speed is a bit worse (~0.91 MBps, compared to 1.27 MBps when piping
+    directly to a file), but overall we ended up waiting less time (1 second compared to
+    1.5 seconds above), because the daemon is more frugal (the output is only 0.94 MB,
+    compared to the 1.9 MB file).
+    </para>
+
+    <para>However, that still means your code will be standing around for 1 second,
+    waiting for Octave's output, and only when everything's done will it actually start
+    processing the output. That's an annoying bottleneck; luckily, it can be ameliorated
+    using the partial output mechanism.
+    </para>
+
+    <para>Partial output means you allow the controller to return partial Octave output, as
+    it becomes available. That's particularly useful if you need to post-process Octave's output
+    for display. Using this mechanism is quite simple -- all you have to do is register
+    a callback function or method to handle the partial output, as shown here:
+
+    {@example adv1_3.php}
+
+    The same holds true with network-based connectors:
+
+    {@example adv1_4.php}
+
+    You will notice that the ad hoc connector returns much more fragmented partial results
+    than the network connector. The ad hoc connector doesn't always return very fragmented
+    partial results, but the network connector never does. That is intentional. Internally,
+    the connector exhibits the behavior displayed by the ad hoc connector. The server however
+    only pushes partial results over the network when they exceed a
+    {@link Octave_controller::$partialLimit certain limit}, because sending a lot of very
+    small partial results would be inefficient. The ad hoc connector doesn't have that
+    limitation, because no network-related overheads are present.
+    </para>
+  </refsect1>
+</refentry>
