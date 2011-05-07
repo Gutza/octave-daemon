@@ -1,0 +1,39 @@
+/*
+$ # Command 1
+$ time echo eye\(1\) | octave > delme.file 2>/dev/null
+
+real    0m0.993s
+user    0m0.906s
+sys     0m0.087s
+
+$ # Command 2
+$ time echo eye\(700\) | octave > delme.file 2>/dev/null
+
+real    0m2.521s
+user    0m0.981s
+sys     0m1.540s
+
+$ # Command 3
+$ time echo eye\(700\) | octave > /dev/null 2>/dev/null
+
+real    0m1.620s
+user    0m1.334s
+sys     0m0.173s
+
+$ # Command 4
+$ ls -sh delme.file
+1.9M delme.file
+
+$ # Command 5
+$ time cp delme.file delme2.file
+
+real    0m0.004s
+user    0m0.000s
+sys     0m0.003s
+
+$ # Command 6
+$ octave
+octave:1> tic(); A=eye(700); toc();
+Elapsed time is 0.00164509 seconds.
+
+*/
