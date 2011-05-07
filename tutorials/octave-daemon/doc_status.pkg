@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry id="{@id proto}">
+  <refmeta>
+    <refentrytitle></refentrytitle>
+
+    <manvolnum></manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>Documentation status</refname>
+
+    <refpurpose>How to learn what you need</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command></command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 id="{@id doc_status}">
+    <title>Overview</title>
+
+    <para>Unfortunately the documentation is incomplete, and it's probably
+    going to stay this way if nobody gets involved. You should start with
+    {@tutorial octave-daemon.pkg the overview}, which helps you understand
+    what this project is about, and some of its known limitations. If you're
+    writing code in PHP, you should continue with {@tutorial quickstart.pkg the quickstart guide},
+    a frugal tutorial that explains and exemplifies the most common usage
+    scenarios. If you're writing in a different programming language, you
+    might be interested in the {@tutorial protocol.pkg network protocol specification}.
+    If you're interested in developing this project you can get a grasp of how
+    things work on the server side by glancing at {@tutorial server.pkg the server structure};
+    also, class {@link Octave_controller} is the only one which is properly documented
+    (and that's the one carrying most of the weight around here, anyway).
+    For information on the configuration options just look inside the configuration
+    file, everything's well documented there (and quite self-explanatory anyway).</para>
+
+    <para>That's pretty much it in the way of documentation; most classes
+    are almost completely undocumented, save for method names and parameter list.</para>
+
+    <para>On a side note, you can generate a local copy of this documentation in any
+    {@link http://manual.phpdoc.org/HTMLSmartyConverter/HandS/phpDocumentor/tutorial_phpDocumentor.howto.pkg.html#using.command-line.output format supported by phpDocumentor}
+    (HTML, CHM, PDF) by running your local copy of gendoc.sh (and tweaking it, if needed);
+    you will obviously need to install phpDocumentor in order to do that
+    (for most modern Linux distros that's just a matter of installing
+    {@link http://pear.php.net/ PEAR} and typing "pear install phpDocumentor" in a console).
+    </para>
+  </refsect1>
+</refentry>
