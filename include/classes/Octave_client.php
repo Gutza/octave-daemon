@@ -31,11 +31,11 @@
 * @subpackage client
 */
 class Octave_client extends Octave_partial_processor
-	implements iOctave_protocol, iOctave_connector, iOctave_network
+	implements iOctave_protocol, iOctave_connector
 {
 
 	public $server_address='127.0.0.1';
-	public $server_port=self::default_port;
+	public $server_port=OCTAVE_DAEMON_PORT;
 	public $lastError="";
 	public $socketLimit=1048576;
 
