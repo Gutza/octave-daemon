@@ -103,9 +103,18 @@ class Octave_client_socket implements iOctave_protocol
 		if (!$partial)
 			$message.=self::error_end;
 
-		$msgLength=strlen($message);
-
-		return $msgLength==@socket_write($this->socket,$message,$msgLength);
+		$bytesLeft=strlen($message);
+		while($bytesLeft) {
+			$written=@socket_write($this->socket,$message,$bytesLeft);
+			if ($written===false)
+				return false;
+			$bytesLeft-=$written;
+			if ($bytesLeft) {
+				$message=substr($message,$written);
+				usleep(100);
+			}
+		}
+		return true;
 	}
 
 	public function read()
@@ -201,8 +210,11 @@ class Octave_client_socket implements iOctave_protocol
 			if (!$this->write($response['response'],true))
 				return $this->controller->everything() && false;
 
-			if (!$partial)
+			if (!$partial) {
+				if ($response['error'])
+					Octave_logger::log("[".$this->remoteIP."] ".$response['error'],LOG_WARNING);
 				return $this->write(self::error_start.$response['error'],$partial);
+			}
 
 			$response=array(
 				'response'=>$this->controller->more(),
