@@ -33,10 +33,9 @@
 * @subpackage server
 */
 class Octave_server_socket
-	implements iOctave_network
 {
 	public $server_address='127.0.0.1';
-	public $server_port=self::default_port;
+	public $server_port=OCTAVE_DAEMON_PORT;
 	public $lastError="";
 	public $allowed_ranges=NULL;
 
