@@ -36,6 +36,14 @@ abstract class Octave_partial_processor
 	protected $partialProcessing=false;
 	private $partialHandler=NULL;
 
+	/**
+	* A method which registers a partial processor for this connector
+	*
+	* If no handler is passed, the existing handler is unregistered.
+	*
+	* @param $handler {@link http://www.php.net/manual/en/language.pseudo-types.php#language.types.callback callback}
+	* @return void
+	*/
 	public function registerPartialHandler($handler=NULL)
 	{
 		if ($handler===NULL) {
@@ -46,6 +54,15 @@ abstract class Octave_partial_processor
 		$this->partialHandler=$handler;
 	}
 
+	/**
+	* This is the method that calls the callbacks.
+	*
+	* Callbacks are expected to accept the same parameters
+	* as this method.
+	*
+	* @param $payload string the contect
+	* @param $partial boolean whether this is a partial result
+	*/
 	protected function partialProcess($payload,$partial)
 	{
 		return call_user_func($this->partialHandler,$payload,$partial);
