@@ -54,20 +54,20 @@ if (!exec("which octave 2>/dev/null")) {
 }
 
 // The classes that we need to compile
-$classes=array(
-	"Octave_daemon",
-	"Octave_partial_processor",
-	"iOctave_network",
-	"Octave_configuration",
-	"Octave_IP_processor",
-	"Octave_IP_range",
-	"Octave_pool",
-	"Octave_server_socket",
-	"Octave_controller",
-	"iOctave_connector",
-	"Octave_client_socket",
-	"iOctave_protocol",
-	"Octave_logger",
+$files=array(
+	"include/Octave_constants.php",
+	"include/classes/Octave_daemon.php",
+	"include/classes/Octave_partial_processor.php",
+	"include/classes/Octave_configuration.php",
+	"include/classes/Octave_IP_processor.php",
+	"include/classes/Octave_IP_range.php",
+	"include/classes/Octave_pool.php",
+	"include/classes/Octave_server_socket.php",
+	"include/classes/Octave_controller.php",
+	"include/classes/iOctave_connector.php",
+	"include/classes/Octave_client_socket.php",
+	"include/classes/iOctave_protocol.php",
+	"include/classes/Octave_logger.php",
 );
 
 // Generate the temporary file
@@ -81,8 +81,8 @@ if (!$tmp)
 
 // Build the code
 fputs($tmp,"<?php\n");
-foreach($classes as $class) {
-	$fp=fopen("include/classes/$class.php","r");
+foreach($files as $file) {
+	$fp=fopen($file,"r");
 	if (!$fp)
 		exit(2);
 	$started=false;
@@ -90,6 +90,7 @@ foreach($classes as $class) {
 		$line=fgets($fp);
 		if (!$started) {
 			if (
+				substr($line,0,6)!='define' &&
 				substr($line,0,8)!='abstract' &&
 				substr($line,0,5)!='class' &&
 				substr($line,0,9)!='interface'
