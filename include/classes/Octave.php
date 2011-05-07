@@ -38,14 +38,72 @@
 class Octave
 	implements iOctave_network
 {
+
+	/**
+	* The last error encountered by this instance.
+	*
+	* Empty string if there were no errors. Gets overwritten
+	* on every connector call.
+	*
+	* @var string
+	*/
 	public $lastError="";
+
+	/**
+	* Whether to issue PHP warnings on errors or not
+	*
+	* @var boolean
+	*/
 	public $quiet=false;
 
+	/**
+	* The connector used by this instance.
+	*
+	* This is guaranteed to implement {@link iOctave_connector}.
+	*
+	* @var object
+	*/
 	protected $connector=NULL;
-	protected $connectorMethods=array('run','runRead','query');
 
+	/**
+	* The methods supported by the connector.
+	*
+	* This is automatically populated by {@link init()}
+	* with the methods in {@link iOctave_connector}.
+	*
+	* @var array
+	*/
+	protected $connectorMethods=array();
+
+	/**
+	* Whether this instance was initialized.
+	*
+	* This gets set by {@link init()}.
+	*
+	* @var boolean
+	*/
 	protected $initialized=false;
 
+	/**
+	* The constructor.
+	*
+	* Builds the necessary connector, depending on the parameters:
+	* - If $connect is boolean, it instantiates an ad hoc connector
+	*   ({@link Octave_controller}); in this case, $port is ignored.
+	* - If $connect is a string, it instantiates a network client
+	*   ({@link Octave_client}), and $connect is taken to be the
+	*   address or hostname of the server.
+	*   If port is not specified, the {@link iOctave_network::default_port default port}
+	*   is used; if specified, it is used as such.
+	* - If $connect is an object, that object is used as the connector.
+	*   The object must implement {@link iOctave_connector}. In this case,
+	*   $port is ignored.
+	* - In all other cases, an exception is thrown.
+	*
+	* @param $connect mixed Connector information
+	* @param $port integer The port used by network clients.
+	* @return void
+	*/
 	public function __construct($connect,$port=self::default_port)
 	{
 		switch(gettype($connect)) {
@@ -59,10 +117,22 @@ class Octave
 				$this->connector=$connect;
 				break;
 			default:
-				throw new RuntimeException("Unknown connection type: ".gettype($connect));
+				throw new RuntimeException(
+					"Unknown connection type: ".
+					gettype($connect)
+				);
 		}
 	}
 
+	/**
+	* Initializes the connector.
+	*
+	* This method is called automatically, you generally don't need
+	* to cll this directly (it's typically only called explicitly for
+	* development -- debugging, profiling etc).
+	*
+	* @return mixed true if initialized, false on error, or NULL if already initialized
+	*/
 	function init()
 	{
 		if ($this->initialized)
@@ -70,6 +140,7 @@ class Octave
 
 		if (!$this->connector instanceof iOctave_connector)
 			throw new RuntimeException("The connector must implement iOctave_connector!");
+
 		if (!$this->connector->init()) {
 			$this->lastError=$this->connector->lastError;
 			return false;
@@ -80,6 +151,10 @@ class Octave
 		return $this->initialized=true;
 	}
 
+	/**
+	* Calls for methods registered in {@link iOctave_connector}
+	* (these go through directly to the connector).
+	*/
 	public function __call($method,$payload)
 	{
 		if (!in_array($method,$this->connectorMethods))
@@ -94,21 +169,51 @@ class Octave
 		return $result;
 	}
 
+	/**
+	* A call to {@link iOctave_connector::query()}
+	* processed with {@link matrix2array()}.
+	*/
 	public function getMatrix($query)
 	{
 		$raw=$this->query($query);
 		if (!strlen(trim($raw)))
 			return array();
+		return $this->matrix2array($raw);
+	}
 
-		$matrix=array();
-		$lines=explode("\n",$raw);
+	/**
+	* Converts an Octave matrix to a PHP array.
+	*
+	* Currently only supports two-dimensional arrays, and will
+	* output a two-dimensional array even if the input is a vector.
+	*
+	* The result is an indexed array (the matrix) of indexed arrays
+	* (the rows).
+	*
+	* @param $matrix string the Octave matrix
+	* @return array the PHP array
+	*/
+	public function matrix2array($matrix)
+	{
+		$array=array();
+		$lines=explode("\n",$matrix);
 		foreach($lines as $line) {
 			$line=trim($line);
 			if (!strlen($line))
 				continue;
-			$matrix[]=explode(" ",trim($line));
+			$array[]=explode(" ",trim($line));
 		}
 
-		return $matrix;
+		return $array;
+	}
+
+	/**
+	* Registers a handler for partial processing.
+	*
+	* This simply calls the connector's {@link Octave_partial_processor::registerPartialHandler()} method.
+	*/
+	public function registerPartialHandler($handler=NULL)
+	{
+		return $this->connector->registerPartialHandler($handler);
 	}
 }
