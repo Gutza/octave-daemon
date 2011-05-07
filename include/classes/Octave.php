@@ -29,14 +29,15 @@
 * This is the public front end.
 *
 * This is basically a wrapper for {@link Octave_controller} or
-* {@link Octave_client}, which also implements a couple of data
-* type translators for PHP.
+* {@link Octave_client}, and also implements a couple of data
+* type translators for PHP. Take a look at the {@link __construct() constructor}
+* for more information on how to instantiate it, and read the
+* {@tutorial quickstart.pkg Quick Start} tutorial for usage examples.
 *
 * @package octave-daemon
 * @subpackage client
 */
 class Octave
-	implements iOctave_network
 {
 
 	/**
@@ -93,8 +94,8 @@ class Octave
 	* - If $connect is a string, it instantiates a network client
 	*   ({@link Octave_client}), and $connect is taken to be the
 	*   address or hostname of the server.
-	*   If port is not specified, the {@link iOctave_network::default_port default port}
-	*   is used; if specified, it is used as such.
+	*   If $port is not specified, the {@link OCTAVE_DAEMON_PORT default port}
+	*   is used; if $port is specified, it is used as such.
 	* - If $connect is an object, that object is used as the connector.
 	*   The object must implement {@link iOctave_connector}. In this case,
 	*   $port is ignored.
@@ -104,7 +105,7 @@ class Octave
 	* @param $port integer The port used by network clients.
 	* @return void
 	*/
-	public function __construct($connect,$port=self::default_port)
+	public function __construct($connect,$port=OCTAVE_DAEMON_PORT)
 	{
 		switch(gettype($connect)) {
 			case "string":
