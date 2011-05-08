@@ -35,7 +35,7 @@
 
     Command 1 shows the baseline time for starting Octave on this server (about one second).
     Command 2 outputs half a million cells in delme.file (the resulting file size
-    is shown in Command 4); that adds 1.5 seconds basicaly just for outputting the matrix
+    is shown in Command 4); that adds 1.5 seconds basically just for outputting the matrix
     (the matrix is generated in virtually no time at all, as shown in Command 6).
     The performance is appalling -- 1.9 MB in 1.5 seconds boils down to 1.27 MBps
     (and that has nothing to do with disk performance, as shown by Command 5).
