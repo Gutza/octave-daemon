@@ -49,7 +49,7 @@
 
     {@example qs1_2.php}
 
-    If for some reason you had to use a differeny port from the default,
+    If for some reason you had to use a different port from the default,
     you can specify that as well:
 
     {@example qs1_3.php}
