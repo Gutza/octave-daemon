@@ -86,6 +86,24 @@ class Octave
 	protected $initialized=false;
 
 	/**
+	* The default configuration settings. Use this with
+	* {@link getCurrent()}.
+	*
+	* This emulates the parameters accepted by {@link __construct()}:
+	* - If it's a boolean, it instantiates an ad hoc connector
+	* - If it's a string, it can be either a host name, or a hostname
+	*   followed by a colon followed by the port.
+	* - If it's an object, that object is used as the connector
+	*   (see the constructor's documentation for details).
+	*/
+	static public $defaultConfig="";
+
+	/**
+	* Used internally by {@link setCurrent()} and {@link getCurrent()}.
+	*/
+	static protected $currentInstance;
+
+	/**
 	* The constructor.
 	*
 	* Builds the necessary connector, depending on the parameters:
@@ -158,11 +176,11 @@ class Octave
 	*/
 	public function __call($method,$payload)
 	{
-		if (!in_array($method,$this->connectorMethods))
-			throw new RuntimeException("Unknown method: ".$method);
-
 		if ($this->init()===false)
 			return false;
+
+		if (!in_array($method,$this->connectorMethods))
+			throw new RuntimeException("Unknown method: ".$method);
 
 		$this->connector->quiet=$this->quiet;
 		$result=$this->connector->$method($payload[0]);
@@ -216,5 +234,54 @@ class Octave
 	public function registerPartialHandler($handler=NULL)
 	{
 		return $this->connector->registerPartialHandler($handler);
+	}
+
+	/**
+	* Checks whether variable $varName is set in Octave.
+	*
+	* @param string $varName the name of the variable to test
+	* @return boolean true if set, false otherwise
+	*/
+	public function exists($varName)
+	{
+		return (bool) trim($this->query("exist(\"".addslashes($varName)."\")"));
+	}
+
+	/**
+	* Use this method to instantiate and/or access a single Octave instance
+	* anywhere across your code.
+	*
+	* If you want to set your own instance, use Octave::{@link setCurrent()}
+	* to set the current instance.
+	*
+	* Alternately, set Octave::{@link $defaultConfig} and you're done --
+	* Octave::{@link getCurrent()} instantiates the static instance when it's
+	* first called and returns it.
+	*
+	* Please be advised you don't have any guarantee that you'll get the same
+	* Octave process every time -- this method is simply a way to avoid lugging
+	* around a global variable storing the PHP Octave instance, but that's all
+	* it does.
+	*/
+	public function getCurrent()
+	{
+		if (isset(self::$currentInstance))
+			return self::$currentInstance;
+
+		if (is_string(self::$defaultConfig) && preg_match("/^(.+)\\:([0-9]+)$/",self::$defaultConfig,$matches))
+			self::setCurrent(new Octave($matches[1],$matches[2]));
+		else
+			self::setCurrent(new Octave(self::$defaultConfig));
+
+		return self::$currentInstance;
+	}
+
+	/**
+	* This is used to set the current static Octave instance -- for details
+	* see {@link getCurrent()}.
+	*/
+	public function setCurrent($instance)
+	{
+		self::$currentInstance=$instance;
 	}
 }
