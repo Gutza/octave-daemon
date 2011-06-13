@@ -87,9 +87,9 @@ class Octave
 
 	/**
 	* The default configuration settings. Use this with
-	* {@link getCurrent()}.
+	* {@link Octave::getCurrent()}.
 	*
-	* This emulates the parameters accepted by {@link __construct()}:
+	* This emulates the parameters accepted by {@link Octave::__construct()}:
 	* - If it's a boolean, it instantiates an ad hoc connector
 	* - If it's a string, it can be either a host name, or a hostname
 	*   followed by a colon followed by the port.
@@ -99,7 +99,7 @@ class Octave
 	static public $defaultConfig="";
 
 	/**
-	* Used internally by {@link setCurrent()} and {@link getCurrent()}.
+	* Used internally by {@link Octave::setCurrent()} and {@link Octave::getCurrent()}.
 	*/
 	static protected $currentInstance;
 
@@ -251,11 +251,11 @@ class Octave
 	* Use this method to instantiate and/or access a single Octave instance
 	* anywhere across your code.
 	*
-	* If you want to set your own instance, use Octave::{@link setCurrent()}
+	* If you want to set your own instance, use {@link Octave::setCurrent()}
 	* to set the current instance.
 	*
-	* Alternately, set Octave::{@link $defaultConfig} and you're done --
-	* Octave::{@link getCurrent()} instantiates the static instance when it's
+	* Alternately, set {@link Octave::$defaultConfig} and you're done --
+	* {@link Octave::getCurrent()} instantiates the static instance when it's
 	* first called and returns it.
 	*
 	* Please be advised you don't have any guarantee that you'll get the same
@@ -278,7 +278,7 @@ class Octave
 
 	/**
 	* This is used to set the current static Octave instance -- for details
-	* see {@link getCurrent()}.
+	* see {@link Octave::getCurrent()}.
 	*/
 	public function setCurrent($instance)
 	{
