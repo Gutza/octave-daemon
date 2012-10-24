@@ -214,7 +214,7 @@ class Octave_daemon
 
 				Octave_pool::manageConnections();
 			}
-			usleep(100);
+			usleep(1000);
 		}
 
 	}
