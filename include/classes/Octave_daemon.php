@@ -71,6 +71,7 @@ class Octave_daemon
 		if (!self::changeIdentity())
 			return false;
 
+		Octave_pool::$maxCount = self::$config->globals['max_instances'];
 		if (!Octave_pool::startControllers()) {
 			self::$lastError=Octave_pool::$lastError;
 			return false;
