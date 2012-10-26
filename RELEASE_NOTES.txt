@@ -1,0 +1,32 @@
+Version 1.0.1
+Release date: 2012-10-27
+
+Two fixes:
+* (bug) Configuration setting "max_instances" was ignored (the daemon always
+	launched three instances); now this is properly observed
+	(patch by: tasos-bitsios)
+* (tweak) Increased daemon's main run() sleep from 0.1 ms to 1 ms
+	(empirical optimization; patch by: tasos-bitsios)
+
+==============================================================================
+
+Version 1.0.0
+Release date: 2011-07-14
+
+Several minor tweaks were made. More importantly, the project has been
+properly tested in production.
+
+==============================================================================
+
+Version 0.1.1 (alpha)
+Release date: 2011-05-07
+
+Server stability was improved. More documentation was added.
+
+==============================================================================
+
+Version 0.1.0 (alpha)
+Release date: 2011-05-06
+
+This is the first alpha version. This should be stable enough for testing by
+parties who are not necessarily interested in developing this package.

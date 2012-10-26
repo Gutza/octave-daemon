@@ -1,0 +1,4 @@
+Author: Bogdan Stăncescu aka Gutza <bogdan@moongate.ro>
+
+Contributors:
+* tasos-bitsios (https://github.com/tasinet)
