@@ -8,5 +8,4 @@ classes necessary to run ad hoc Octave instances in PHP.
 Homepage and documentation at http://projects.moongate.ro/octave-daemon/
 
 ===Current status===
-The code is working, the installer is installing, but nothing has been
-thoroughly tested in production.
+This code has been used in production since early 2011. All is well.
