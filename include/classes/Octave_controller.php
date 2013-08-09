@@ -61,6 +61,20 @@ class Octave_controller extends Octave_partial_processor
 	public $octave_binary="octave";
 
 	/**
+	* The options you want to pass to the Octave process.
+	*
+	* The "-i" option is added automatically in {@link init()}; if you add
+	* it here it will be ignored.
+	*
+	* The "--no-window-system" is useful because it avoids some annoying
+	* warnings related to plots, but you can remove this option
+	* if you prefer to receive those warnings.
+	*
+	* @var array
+	*/
+	public $octave_options=array("--no-window-system");
+
+	/**
 	* The Octave binary version.
 	*
 	* This is set automatically after {@link init()}
@@ -259,8 +273,13 @@ class Octave_controller extends Octave_partial_processor
 		if ($this->initialized)
 			return NULL;
 
+		$options = array("-i");
+		foreach($this->octave_options as $option)
+			$options[] = trim($option);
+		$options = " ".implode(" ", array_unique($options));
+
 		$this->process=proc_open(
-			$this->octave_path.$this->octave_binary." -i",
+			$this->octave_path.$this->octave_binary.$options,
 			array(
 				0 => array("pipe", "r"),
 				1 => array("pipe", "w"),
