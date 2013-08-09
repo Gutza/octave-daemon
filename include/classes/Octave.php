@@ -189,6 +189,19 @@ class Octave
 	}
 
 	/**
+	* A call to {@link iOctave_connector::query()},
+	* the result of which is interpreted as a boolean
+	* value.
+	*
+	* @return boolean true or false
+	*/
+	public function getBoolean($query)
+	{
+		$raw = $this->query($query);
+		return (bool) intval($raw);
+	}
+
+	/**
 	* A call to {@link iOctave_connector::query()}
 	* processed with {@link matrix2array()}.
 	*/
