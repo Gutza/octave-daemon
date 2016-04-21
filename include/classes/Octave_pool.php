@@ -42,7 +42,7 @@ class Octave_pool
 	{
 	}
 
-	public function getChild($cSocket)
+	public static function getChild($cSocket)
 	{
 		if ($kid=self::firstChild($cSocket))
 			return $kid;
@@ -54,7 +54,7 @@ class Octave_pool
 		return false;
 	}
 
-	public function startControllers()
+	public static function startControllers()
 	{
 		for($i=0;$i<self::$maxCount;$i++)
 			if (!self::registerChild())
@@ -63,7 +63,7 @@ class Octave_pool
 		return true;
 	}
 
-	private function registerChild($cSocket=NULL)
+	private static function registerChild($cSocket=NULL)
 	{
 		$controller=new Octave_controller();
 		$controller->cwd=self::$home_directory;
@@ -92,25 +92,25 @@ class Octave_pool
 		}
 	}
 
-	public function deadChild($pid)
+	public static function deadChild($pid)
 	{
 		foreach(self::$pool as $kid)
 			if ($kid->processFuneral($pid))
 				break;
 	}
 
-	public function killAll()
+	public static function killAll()
 	{
 		foreach(self::$pool as $kid)
 			$kid->kill();
 	}
 
-	public function newConnection($socket)
+	public static function newConnection($socket)
 	{
 		self::$pending_connections[]=$socket;
 	}
 
-	public function manageConnections()
+	public static function manageConnections()
 	{
 		$still_waiting=array();
 		foreach(self::$pending_connections as $cSocket) {
