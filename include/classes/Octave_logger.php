@@ -51,14 +51,14 @@ class Octave_logger
 	{
 	}
 
-	public function getCurrent()
+	public static function getCurrent()
 	{
 		if (isset(self::$instance))
 			return self::$instance;
 		return self::$instance=new Octave_logger();
 	}
 
-	public function init()
+	public static function init()
 	{
 		if (self::$initialized)
 			return NULL;
@@ -72,7 +72,7 @@ class Octave_logger
 		self::$initialized=true;
 	}
 
-	public function log($message,$priority=LOG_WARNING)
+	public static function log($message,$priority=LOG_WARNING)
 	{
 		self::init();
 		syslog($priority,$message);

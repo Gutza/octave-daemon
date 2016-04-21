@@ -49,7 +49,7 @@ class Octave_daemon
 	{
 	}
 
-	public function init()
+	public static function init()
 	{
 		self::$config_file="/etc/octave-daemon.conf";
 
@@ -81,7 +81,7 @@ class Octave_daemon
 		return true;
 	}
 
-	protected function startServers()
+	protected static function startServers()
 	{
 		if (!count(self::$config->servers)) {
 			self::$lastError="There are no servers! Make sure you have at least one [server] section in the configuration file.";
@@ -102,7 +102,7 @@ class Octave_daemon
 		return true;
 	}
 
-	protected function processOptions()
+	protected static function processOptions()
 	{
 		global $argv, $argc;
 		$use_option=false;
@@ -137,7 +137,7 @@ class Octave_daemon
 
 	}
 
-	private function lock()
+	private static function lock()
 	{
 		self::$lockptr=fopen(self::$config_file,'r');
 		if (flock(self::$lockptr,LOCK_EX + LOCK_NB))
@@ -148,7 +148,7 @@ class Octave_daemon
 		return false;
 	}
 
-	private function unlock()
+	private static function unlock()
 	{		
 		if (!flock(self::$lockptr,LOCK_UN))
 			return false;
@@ -157,20 +157,20 @@ class Octave_daemon
 		return true;
 	}
 
-	public function closeServerSockets()
+	public static function closeServerSockets()
 	{
 		foreach(self::$servers as $server)
 			$server->__destruct();
 	}
 
-	public function childMode()
+	public static function childMode()
 	{
 		self::$child_process=true;
 		self::$child_pids=array();
 		self::closeServerSockets();
 	}
 
-	public function kill()
+	public static function kill()
 	{
 		Octave_pool::killAll();
 		if (self::$child_process)
@@ -189,19 +189,19 @@ class Octave_daemon
 		exit;
 	}
 
-	public function deadChild()
+	public static function deadChild()
 	{
 		$pid=pcntl_waitpid(-1,$status);
 		self::manageDeadPID($pid);
 	}
 
-	public function manageDeadPID($pid)
+	public static function manageDeadPID($pid)
 	{
 		unset(self::$child_pids[$pid]);
 		Octave_pool::deadChild($pid);
 	}
 
-	public function run()
+	public static function run()
 	{
 		declare(ticks = 1); 
 		pcntl_signal(SIGCHLD, array('Octave_daemon','deadChild'));
@@ -219,7 +219,7 @@ class Octave_daemon
 
 	}
 
-	private function changeIdentity()
+	private static function changeIdentity()
 	{
 		if (!function_exists("posix_getuid")) {
 			self::$lastError="Octave-daemon requires POSIX functions; please see http://www.php.net/manual/en/book.posix.php";
@@ -269,7 +269,7 @@ class Octave_daemon
 		return true;
 	}
 
-	private function daemonize()
+	private static function daemonize()
 	{
 		if (!self::$daemonize)
 			return true;
@@ -292,7 +292,7 @@ class Octave_daemon
 		return true;
 	}
 
-	private function writePID()
+	private static function writePID()
 	{
 		if (!isset(self::$config->globals["pid_file"]) || !self::$config->globals["pid_file"])
 			return true;
