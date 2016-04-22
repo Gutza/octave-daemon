@@ -1,0 +1,14 @@
+{
+    "name": "gutza/octave-daemon",
+    "description": "The PHP network daemon for GNU Octave http://projects.moongate.ro/octave-daemon/",
+    "type": "library",
+    "license": "GNU Affero General Public License",
+    "require": {},
+    "autoload": {
+        "classmap": [ "include/classes"],
+        "files": ["include/Octave_constants.php"]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    }
+}
