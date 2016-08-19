@@ -72,7 +72,7 @@ class Octave_controller extends Octave_partial_processor
 	*
 	* @var array
 	*/
-	public $octave_options=array("--no-window-system");
+	public $octave_options=array("--no-window-system", "--no-gui", "--no-gui-libs");
 
 	/**
 	* The Octave binary version.
