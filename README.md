@@ -1,5 +1,5 @@
 # Octave Daemon
-This is a network daemon for [http://www.gnu.org/software/octave/](GNU Octave), written in PHP.
+This is a network daemon for [GNU Octave](http://www.gnu.org/software/octave/), written in PHP.
 
 The package also contains the client classes for PHP, and the classes necessary to run ad hoc Octave instances in PHP.
 
